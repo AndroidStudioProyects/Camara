@@ -90,7 +90,7 @@ public class ConnectUploadAsync extends AsyncTask<Void,Integer,Boolean> {
                     File file = files[i];
 
                     //Si es directorio...
-                   System.out.println("[" + i + "]" + file.getName());
+              //     System.out.println("[" + i + "]" + file.getName());
                 }
 
         try {  fileLast = files[files.length-1];

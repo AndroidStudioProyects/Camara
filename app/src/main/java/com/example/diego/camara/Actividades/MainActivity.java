@@ -124,9 +124,22 @@ public class MainActivity extends AppCompatActivity {
         IdRadiobase = Integer.parseInt(edit_IdRadio.getText().toString());
         IpPublica=edit_IP.getText().toString();
         BotonesEnabled(false);
-        CAMARA_ON();
 
 
+     CAMARA_ON();
+        ////defino bluetooth adapter
+
+        btAdapter=BluetoothAdapter.getDefaultAdapter();
+        checkBTState();//Checkeo el estado
+
+        Log.d(TAG, "OnCreate fin");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "OnResume ");
+        CargarPreferencias();
 
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
@@ -142,28 +155,14 @@ public class MainActivity extends AppCompatActivity {
                             Alarmabluetooth=sbprint;
                             textIn.setText(Alarmabluetooth);
                             sb.delete(0, sb.length());                                      // and clear
-
-
+                           // Filmacion();
+                         //   mCamera.takePicture(null,null, mPicture);
                         }
                         Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
                         break;
                 }
-            };
+            }
         };
-
-        ////defino bluetooth adapter
-
-        btAdapter=BluetoothAdapter.getDefaultAdapter();
-        checkBTState();//Checkeo el estado
-
-        Log.d(TAG, "OnCreate fin");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "OnResume ");
-        CargarPreferencias();
 
         //// bluettohhh
 
@@ -218,8 +217,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "OnPause");
-     //     releaseMediaRecorder();       // if you are using MediaRecorder, release it first
-       //      releaseCamera();              // release the camera immediately on pause event
+
         GuardarPreferencias();
     }
 
@@ -227,8 +225,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "OnStop");
-        GuardarPreferencias(); GuardarPreferencias();
-
+        GuardarPreferencias();
+     //   mCamera.startPreview();
     }
 
     @Override
@@ -411,6 +409,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 mCamera.takePicture(null, null, mPicture);
+             EnviarFTP();
                 Log.d(TAG, "Boton de Foto");
 
 
@@ -549,12 +548,14 @@ public class MainActivity extends AppCompatActivity {
                 if(!textIn.getText().toString().equals("F")) {
 
                     mCamera.takePicture(null, null, mPicture);
+
                     Log.d(TAG, "Alarmeta");
                     String IP = edit_IP.getText().toString();
                     int Port = Integer.parseInt(edit_Port.getText().toString());
                     int IdRadiobase = Integer.parseInt(edit_IdRadio.getText().toString());
                     Log.d(TAG, "IdRadiobase:" + IdRadiobase);
                     String Alarma = textIn.getText().toString();
+
                     CheckAlarmas CheckAlarmita = new CheckAlarmas(IdRadiobase, Alarma, IP, Port, getApplicationContext(),audioBool);
                     CheckAlarmita.start();
                     textIn.setText("F");
@@ -768,6 +769,10 @@ public class MainActivity extends AppCompatActivity {
                 EnviarFTP();
 
 
+                    mCamera.startPreview();
+
+
+
             } catch (FileNotFoundException e) {
                 Log.d(TAG, "File not found: " + e.getMessage());
             } catch (IOException e) {
@@ -958,4 +963,12 @@ public boolean onCreateOptionsMenu(Menu menu) {
 
     }
 
+
+
+
+
+
+
 }
+
+
