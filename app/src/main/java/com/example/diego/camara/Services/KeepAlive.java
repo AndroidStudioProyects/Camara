@@ -17,7 +17,7 @@ public class KeepAlive  extends Service {
     static ConexionIP ClienteTCP;
     static int IdRadiobase, TiempoSeg,PuertoKA;
     static String IpPublica;
-    String TAG = "Usb Arduino";
+    String TAG = "Camara";
     static boolean Bool;
     Intent intento;
     Hilo hilito;
@@ -36,7 +36,7 @@ public class KeepAlive  extends Service {
         TiempoSeg = intento.getExtras().getInt("Timer");
         hilito=new Hilo();
         hilito.start();
-        Toast.makeText(getApplicationContext(), "Servicio iniciado: " + Bool, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Servicio Keep Alive iniciado", Toast.LENGTH_SHORT).show();
 
       return START_STICKY;
     }
@@ -66,11 +66,11 @@ public class KeepAlive  extends Service {
         @Override
         public void run() {
             while(Bool){
-                Log.d("USB_ARDUINO", "Bool " + Bool);
+
             try {
                 Thread.sleep(TiempoSeg * 1000);
                 ClienteTCP=new ConexionIP(IpPublica,PuertoKA," "+IdRadiobase+" 1");
-                Log.d("USB_ARDUINO", "IpPublica: " + IpPublica + "PuertoKA: " + PuertoKA + "TiempoSeg: " + TiempoSeg + "Bool: " + Bool + "IdRadiobase: " + IdRadiobase);
+                Log.d("Camara", "IpPublica: " + IpPublica + " PuertoKA: " + PuertoKA + " TiempoSeg: " + TiempoSeg + "Bool: " + Bool + "IdRadiobase: " + IdRadiobase);
                 ClienteTCP.start();
             } catch (InterruptedException e) {
                 e.printStackTrace();
