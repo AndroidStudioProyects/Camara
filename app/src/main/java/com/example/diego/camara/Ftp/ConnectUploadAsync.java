@@ -69,7 +69,7 @@ public class ConnectUploadAsync extends AsyncTask<Void,Integer,Boolean> {
               //  Log.d("Api FTP", "Numeros de archivos" + String.valueOf(mFileArray.length));
 
                 for(int i=0;i<mFileArray.length;i++){
-                    Log.d("Api FTP", "nombre archivo" + mFileArray[i].getName());
+               //     Log.d("Api FTP", "nombre archivo" + mFileArray[i].getName());
                   }
 
                 Log.d("Api FTP", "IP Server:" + String.valueOf(mFtpClient.getRemoteAddress()));

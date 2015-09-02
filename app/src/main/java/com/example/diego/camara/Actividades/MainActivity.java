@@ -75,8 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Linvor Bluetooth
     private static String address = "00:12:12:04:41:11";
-
-
+    public static String Alarmabluetooth="0";
     // BLUETOOTH FIN
 
     ToggleButton buttonLed,toggleAudio, toogleAlarma,toggle_ka;
@@ -120,12 +119,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         LevantarXML();
         Botones();
+        CargarPreferencias();
 
-        IdRadiobase= Integer.parseInt(edit_IdRadio.getText().toString());
+        IdRadiobase = Integer.parseInt(edit_IdRadio.getText().toString());
         IpPublica=edit_IP.getText().toString();
         BotonesEnabled(false);
         CAMARA_ON();
-        CargarPreferencias();
+
 
 
         h = new Handler() {
@@ -138,8 +138,10 @@ public class MainActivity extends AppCompatActivity {
                         int endOfLineIndex = sb.indexOf("\r\n");                            // determine the end-of-line
                         if (endOfLineIndex > 0) {                                            // if end-of-line,
                             String sbprint = sb.substring(0, endOfLineIndex);               // extract string
+                            Toast.makeText(getApplicationContext(),"Alarma:"+sbprint,Toast.LENGTH_SHORT).show();
+                            Alarmabluetooth=sbprint;
+                            textIn.setText(Alarmabluetooth);
                             sb.delete(0, sb.length());                                      // and clear
-
 
 
                         }
