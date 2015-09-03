@@ -37,7 +37,6 @@ import android.widget.ToggleButton;
 
 import com.example.diego.camara.Ftp.ConnectUploadAsync;
 import com.example.diego.camara.Funciones.CheckAlarmas;
-import com.example.diego.camara.Funciones.TomarFoto;
 import com.example.diego.camara.R;
 import com.example.diego.camara.Services.KeepAlive;
 
@@ -48,7 +47,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -57,20 +55,17 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity {
 
             //   BLUETOOTH !
-            private StringBuilder sb= new StringBuilder();
+    private StringBuilder sb= new StringBuilder();
     final int RECIEVE_MESSAGE=1;
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
     private Handler h;
     ConnectedThread mConnectedThread;
-
     // SPP UUID service
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     // MAC-address of Bluetooth module (you must edit this line)
-
-    //
     //private static String address = "00:14:01:06:13:29";
 
     //Linvor Bluetooth
@@ -78,17 +73,15 @@ public class MainActivity extends AppCompatActivity {
     public static String Alarmabluetooth="0";
     // BLUETOOTH FIN
 
-    ToggleButton buttonLed,toggleAudio, toogleAlarma,toggle_ka;
+    ToggleButton toggleAudio, toggle_ka;
     Switch switch_button;
     static EditText textOut,edit_IP,edit_Port,edit_IdRadio,textIn,edit_TimerKA,edit_PortKA;
     Button buttonSend, btn_Prueba, btn_Foto, btn_Video, btn_Intrusion,btn_USB;
     Button btn_Energia,btn_Apertura,btn_Conf_FTP,btn_Enviar_FTP;
-   public TextView textAlarma1,text_Bytes;
-  public ProgressBar progressBar;
+    public TextView textAlarma1,text_Bytes;
+    public ProgressBar progressBar;
 
     String stringToRx;
-    File ImagenFile;
-    byte dataRx;// datos entrantes al usb del telefono
     private FrameLayout preview;
     private SurfaceView mPreview;
     Boolean isRecording = false;
@@ -98,18 +91,14 @@ public class MainActivity extends AppCompatActivity {
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
     private int calidadFoto = 90;
-    private Socket socket;
 
-    private Thread RX, Audio;
     static final String TAG = "Camara";
-    TomarFoto tomarfoto;
     boolean audioBool=false;
     int  IdRadiobase=0;
     Intent intentKeepAlive;
-   public ConnectUploadAsync cliente;
+    public ConnectUploadAsync cliente;
     String IpPublica;
 
-    String TelDiego="2235776581";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,19 +108,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         LevantarXML();
         Botones();
-        CargarPreferencias();
 
         IdRadiobase = Integer.parseInt(edit_IdRadio.getText().toString());
         IpPublica=edit_IP.getText().toString();
-        BotonesEnabled(false);
-
-
-     CAMARA_ON();
+  //      BotonesEnabled(false);
+        CAMARA_ON();
         ////defino bluetooth adapter
-
         btAdapter=BluetoothAdapter.getDefaultAdapter();
         checkBTState();//Checkeo el estado
-
         Log.d(TAG, "OnCreate fin");
     }
 
@@ -205,20 +189,14 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
         }
-
-
-
         mConnectedThread = new ConnectedThread(btSocket);
         mConnectedThread.start();
-
   }
 
     @Override
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "OnPause");
-
-        GuardarPreferencias();
     }
 
     @Override
@@ -254,14 +232,12 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e2) {
             errorExit("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
         }
-
-
     }
 
     private void CAMARA_ON() {
-        mCamera = getCameraInstance();
+       mCamera = getCameraInstance();
        mPreview = new CameraPreview(getApplicationContext(), mCamera);
-            preview.addView(mPreview);
+       preview.addView(mPreview);
 
     }
 
@@ -352,8 +328,6 @@ public class MainActivity extends AppCompatActivity {
     ///////////////7//   //////////////////
     private void Botones() {
 
-
-
         switch_button.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -409,7 +383,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 mCamera.takePicture(null, null, mPicture);
-             EnviarFTP();
+           //  EnviarFTP();
                 Log.d(TAG, "Boton de Foto");
 
 
@@ -506,6 +480,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 if(isChecked){
+                    GuardarPreferencias();
                     IdRadiobase= Integer.parseInt(edit_IdRadio.getText().toString());
                     IpPublica=edit_IP.getText().toString();
 
@@ -514,18 +489,20 @@ public class MainActivity extends AppCompatActivity {
                     intentKeepAlive.putExtra("Id",IdRadiobase );
                     intentKeepAlive.putExtra("Ip", IpPublica);
                     intentKeepAlive.putExtra("PuertoKA", Integer.parseInt(edit_PortKA.getText().toString()));
-                    intentKeepAlive.putExtra("bool",true);
+                    intentKeepAlive.putExtra("bool", true);
                     intentKeepAlive.putExtra("Timer", Timer);
                     startService(intentKeepAlive);
                     BotonesEnabled(isChecked);
+
+
+
                 }else{
-                 stopService(intentKeepAlive);
+
+                    stopService(intentKeepAlive);
                     edit_TimerKA.setEnabled(true);
-                    intentKeepAlive.putExtra("bool",false);
+                   // intentKeepAlive.putExtra("bool",false);
                     BotonesEnabled(isChecked);
-
                 }
-
 
             }
         });
@@ -546,27 +523,19 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d(TAG, "Tesxtin: " + textIn.getText().toString());
                 if(!textIn.getText().toString().equals("F")) {
-
                     mCamera.takePicture(null, null, mPicture);
-
                     Log.d(TAG, "Alarmeta");
                     String IP = edit_IP.getText().toString();
                     int Port = Integer.parseInt(edit_Port.getText().toString());
                     int IdRadiobase = Integer.parseInt(edit_IdRadio.getText().toString());
                     Log.d(TAG, "IdRadiobase:" + IdRadiobase);
                     String Alarma = textIn.getText().toString();
-
                     CheckAlarmas CheckAlarmita = new CheckAlarmas(IdRadiobase, Alarma, IP, Port, getApplicationContext(),audioBool);
                     CheckAlarmita.start();
                     textIn.setText("F");
                 }
-
-
-
             }
         });
-
-
     }
 
     public void Filmacion() {
@@ -606,6 +575,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void LevantarXML() {
+
         textAlarma1 = (TextView) findViewById(R.id.textAlarma1);
         textOut = (EditText) findViewById(R.id.textout);
         textIn = (EditText) findViewById(R.id.textin);
@@ -641,9 +611,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-    ///////////////  CheckAlarmas///////////////
-
     ////////////////////////// ++++   FOTO y VIDEO +++++ /////////////////
 
     public void PARAMETROS() {
@@ -670,7 +637,6 @@ public class MainActivity extends AppCompatActivity {
         mCamera.setParameters(parameters);
         Log.d(TAG, "Parametros de la Camara Cargados");
     }
-
 
     /** A safe way to get an instance of the Camera object. */
     public static Camera getCameraInstance(){
@@ -765,14 +731,8 @@ public class MainActivity extends AppCompatActivity {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
                 fos.write(data);
                 fos.close();
-
                 EnviarFTP();
-
-
-                    mCamera.startPreview();
-
-
-
+                mCamera.startPreview();
             } catch (FileNotFoundException e) {
                 Log.d(TAG, "File not found: " + e.getMessage());
             } catch (IOException e) {
@@ -890,20 +850,20 @@ public class MainActivity extends AppCompatActivity {
 ///////////////////// PREFERENCIAS DE USUARIO ////////////////
     public void CargarPreferencias(){
 
-     SharedPreferences mispreferencias=getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
-
-     edit_IdRadio.setText(mispreferencias.getString("IdRadio", "1"));
-     edit_IP.setText(mispreferencias.getString("edit_IP", "idirect.dlinkddns.com"));
-     edit_Port.setText(mispreferencias.getString("edit_Port", "9001"));
-     edit_PortKA.setText(mispreferencias.getString("edit_PortKA", "9002"));
-     edit_TimerKA.setText(mispreferencias.getString("edit_TimerKA", "15"));
-
-Log.d(TAG, "Preferencias Cargadas");
-
+        SharedPreferences mispreferencias=getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
+        edit_IdRadio.setText(mispreferencias.getString("IdRadio", "1"));
+        edit_IP.setText(mispreferencias.getString("edit_IP", "idirect.dlinkddns.com"));
+        edit_Port.setText(mispreferencias.getString("edit_Port", "9001"));
+        edit_PortKA.setText(mispreferencias.getString("edit_PortKA", "9002"));
+        edit_TimerKA.setText(mispreferencias.getString("edit_TimerKA", "10"));
+        toggleAudio.setChecked(mispreferencias.getBoolean("audioBool", true));
+        toggle_ka.setChecked(mispreferencias.getBoolean("boolKA", true));
+        Log.d(TAG, "Preferencias Cargadas , boolKA: " + toggle_ka.isChecked());
 
  }
 
     public void GuardarPreferencias() {
+
         SharedPreferences mispreferencias = getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mispreferencias.edit();
         editor.putString("IdRadio", edit_IdRadio.getText().toString());
@@ -911,9 +871,11 @@ Log.d(TAG, "Preferencias Cargadas");
         editor.putString("edit_Port", edit_Port.getText().toString());
         editor.putString("edit_PortKA", edit_PortKA.getText().toString());
         editor.putString("edit_TimerKA", edit_TimerKA.getText().toString());
-        editor.commit();
-        Log.d(TAG, "Preferencias Almacenadas");
 
+        editor.putBoolean("audioBool", toggleAudio.isChecked());
+        editor.putBoolean("boolKA", toggle_ka.isChecked());
+        editor.commit();
+        Log.d(TAG, "Preferencias Guardadas , boolKA: " + mispreferencias.getBoolean("boolKA", true));
 
     }
 
@@ -963,7 +925,32 @@ public boolean onCreateOptionsMenu(Menu menu) {
 
     }
 
+private void FuncionKA(Boolean bolka){
 
+
+    if(bolka){
+        IdRadiobase= Integer.parseInt(edit_IdRadio.getText().toString());
+        IpPublica=edit_IP.getText().toString();
+
+        int Timer= Integer.parseInt(edit_TimerKA.getText().toString());
+        intentKeepAlive=new Intent(getApplicationContext(), KeepAlive.class);
+        intentKeepAlive.putExtra("Id",IdRadiobase );
+        intentKeepAlive.putExtra("Ip", IpPublica);
+        intentKeepAlive.putExtra("PuertoKA", Integer.parseInt(edit_PortKA.getText().toString()));
+        intentKeepAlive.putExtra("bool",true);
+        intentKeepAlive.putExtra("Timer", Timer);
+        startService(intentKeepAlive);
+
+    }else{
+        stopService(intentKeepAlive);
+        edit_TimerKA.setEnabled(true);
+        //intentKeepAlive.putExtra("bool", false);
+
+
+    }
+
+
+}
 
 
 

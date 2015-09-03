@@ -40,7 +40,7 @@ public class Lay_Ftp extends Activity {
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.lay_ftp);
-            levantar_xml();
+           levantar_xml();
             Botones();
             CargarPreferenciasFTP();
 

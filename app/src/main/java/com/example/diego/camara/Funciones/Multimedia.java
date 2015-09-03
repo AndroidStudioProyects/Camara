@@ -9,9 +9,9 @@ import com.example.diego.camara.R;
  * Created by Diego on 14/05/2015.
  */
 public class Multimedia {
-    MediaPlayer mp2,mp3,mp4;
+    MediaPlayer mp2,mp3,mp4,mp6;
 
-       static String TAG="USB_ARDUINO";
+       static String TAG="Camara";
     Context contexto;
 
 int Alarma;
@@ -25,6 +25,7 @@ int Alarma;
         mp2= MediaPlayer.create(contexto, R.raw.alarmadeintrusion);
         mp3= MediaPlayer.create(contexto, R.raw.alarmadeapertura);
         mp4= MediaPlayer.create(contexto, R.raw.alarmadeenergia);
+        mp6= MediaPlayer.create(contexto, R.raw.energiarestablecida);
 
 
     }
@@ -39,11 +40,13 @@ int Alarma;
                     mp2.start();
                     break;
                 case 3:
-
                     mp3.start();
                     break;
                 case 4:
                     mp4.start();
+                    break;
+                case 6:
+                    mp6.start();
                     break;
                 default:
                     break;

@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.diego.camara.Funciones.ConexionIP;
 
@@ -21,14 +20,14 @@ public class SmsRecibido extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
        // this.contexto=context;
-        Toast.makeText(context, "Sms Recibido", Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(context, "Sms Recibido", Toast.LENGTH_SHORT).show();
 
         SharedPreferences mispreferencias=context.getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
         String IP=mispreferencias.getString("edit_IP", "localhost");
 
         int Puerto= Integer.parseInt(mispreferencias.getString("edit_Port", "9001"));
 
-        ConexionIP ClienteTCP=new ConexionIP(IP,Puerto," 1 8");
+        ConexionIP ClienteTCP=new ConexionIP(IP,Puerto," 1 9");
         ClienteTCP.start();
 
         Bundle b = intent.getExtras();
@@ -44,8 +43,8 @@ public class SmsRecibido extends BroadcastReceiver {
                 String idMensaje = mensajes[i].getOriginatingAddress();
                 String textoMensaje = mensajes[i].getMessageBody();
 
-                Log.d("ReceptorSMS", "Remitente: " + idMensaje);
-                Log.d("ReceptorSMS", "Mensaje: " + textoMensaje);
+                Log.d("Camara", "Remitente: " + idMensaje);
+                Log.d("Camara", "Mensaje: " + textoMensaje);
             }
         }
 

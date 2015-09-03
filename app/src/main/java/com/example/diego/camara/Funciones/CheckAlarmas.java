@@ -13,10 +13,10 @@ public class CheckAlarmas extends Thread {
     ConexionIP ClienteTCP;
     int Puerto,IdRadiobase;
     MediaPlayer mpIntrusion,mpApertura,mpSensorOn,mpSensorOff,mpEnergiaOn,mpEnergiaOff,mpPersonalNo,mpEnviandoInfo;
-   // String static final TAG="USB_Arduino";
     Context contex;
-     String TAG="USB_Arduino";
-Boolean audioBool=false;
+    static  String TAG="Camara";
+    Boolean audioBool=false;
+
     public CheckAlarmas(int IdRadiobase,String Alarma,String IpPublica,int Puerto,Context contex,boolean audioBool){
 
         this.Alarma=Alarma;
@@ -36,26 +36,34 @@ Boolean audioBool=false;
 
                Audio =new Multimedia(contex,2);
                if(audioBool){Audio.AudioPlay();}
-        msg=Mensaje(IdRadiobase,2);
-            ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
- ClienteTCP.start();
-     break;
+               msg=Mensaje(IdRadiobase,2);
+               ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
+               ClienteTCP.start();
+               Log.d(TAG, "Audio alarma Intrusion");
+               break;
            case "3":
                Audio =new Multimedia(contex,3);
                if(audioBool){Audio.AudioPlay();}
                msg=Mensaje(IdRadiobase,3);
                ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
-
                ClienteTCP.start();
-
-
+               Log.d(TAG, "Audio alarma ");
                break;
            case "4":
                Audio =new Multimedia(contex,4);
                if(audioBool){Audio.AudioPlay();}
-              msg=Mensaje(IdRadiobase,4);
+               msg=Mensaje(IdRadiobase,4);
                ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
                ClienteTCP.start();
+               Log.d(TAG, "Audio alarma 4");
+               break;
+           case "6":
+               Audio =new Multimedia(contex,6);
+               if(audioBool){Audio.AudioPlay();}
+               msg=Mensaje(IdRadiobase,6);
+               ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
+               ClienteTCP.start();
+               Log.d(TAG, "Audio Sistema Energizado");
                break;
            default:
 
@@ -63,7 +71,7 @@ Boolean audioBool=false;
                     break;
 
        }
-  Log.d(TAG, "Alarmas: " + Alarma);
+  Log.d(TAG, "Alarma: " + Alarma);
 
    }
 
