@@ -100,7 +100,7 @@
                 <Switch
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Alarmas"
+                    android:text="Led"
                     android:id="@+id/switch_Alarma"
                     android:checked="false" />
 
@@ -193,7 +193,7 @@
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="usb"
+                    android:text="Reconectar Bluetooth"
                     android:id="@+id/btn_USB" />
 
             </LinearLayout>

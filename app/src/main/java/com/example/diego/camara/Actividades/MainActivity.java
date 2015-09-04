@@ -117,13 +117,7 @@ public class MainActivity extends AppCompatActivity {
         btAdapter=BluetoothAdapter.getDefaultAdapter();
         checkBTState();//Checkeo el estado
         Log.d(TAG, "OnCreate fin");
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "OnResume ");
-        CargarPreferencias();
 
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
@@ -139,14 +133,23 @@ public class MainActivity extends AppCompatActivity {
                             Alarmabluetooth=sbprint;
                             textIn.setText(Alarmabluetooth);
                             sb.delete(0, sb.length());                                      // and clear
-                           // Filmacion();
-                         //   mCamera.takePicture(null,null, mPicture);
+                            // Filmacion();
+                            //   mCamera.takePicture(null,null, mPicture);
                         }
                         Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
                         break;
                 }
             }
         };
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "OnResume ");
+        CargarPreferencias();
+
 
         //// bluettohhh
 
@@ -273,7 +276,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void errorExit(String title, String message){
-        Toast.makeText(getBaseContext(), title + " - " + message, Toast.LENGTH_LONG).show();
         finish();
     }
 
@@ -332,11 +334,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                       Log.d(TAG, "Alarma Activada");
+                       Log.d(TAG, "Encender Led");
+                    mConnectedThread.write("1\n");
 
               } else {
-                    Log.d(TAG, "Alarma Desac" +
-                            "tivada");
+                    Log.d(TAG, "Apagar Led");
+                    mConnectedThread.write("0\n");
                }
             }
         });
@@ -373,6 +376,46 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
+
+                // Two things are needed to make a connection:
+                //   A MAC address, which we got above.
+                //   A Service ID or UUID.  In this case we are using the
+                //     UUID for SPP.
+
+                try {
+                    btSocket = createBluetoothSocket(device);
+                } catch (IOException e1) {
+                    errorExit("Fatal Error", "In onResume() and socket create failed: " + e1.getMessage() + ".");
+                }
+
+                // Discovery is resource intensive.  Make sure it isn't going on
+                // when you attempt to connect and pass your message.
+                btAdapter.cancelDiscovery();
+
+                // Establish the connection.  This will block until it connects.
+                Log.d(TAG, "...Connecting...");
+                try {
+                    btSocket.connect();
+                    Log.d(TAG, "...Connection ok...");
+                } catch (IOException e) {
+                    try {
+                        btSocket.close();
+                    } catch (IOException e2) {
+                        errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
+                    }
+                }
+
+                // Create a data stream so we can talk to server.
+                Log.d(TAG, "...Create Socket...");
+
+                try {
+                    outStream = btSocket.getOutputStream();
+                } catch (IOException e) {
+                    errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
+                }
+                mConnectedThread = new ConnectedThread(btSocket);
+                mConnectedThread.start();
 
             }
         });
@@ -880,8 +923,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 // //////////////////////////////////////////////////////////
-@Override
-public boolean onCreateOptionsMenu(Menu menu) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.menu_main, menu);
     return true;
@@ -925,7 +968,7 @@ public boolean onCreateOptionsMenu(Menu menu) {
 
     }
 
-private void FuncionKA(Boolean bolka){
+    private void FuncionKA(Boolean bolka){
 
 
     if(bolka){

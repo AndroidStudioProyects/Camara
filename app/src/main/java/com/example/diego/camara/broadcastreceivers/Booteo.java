@@ -17,12 +17,18 @@ public class Booteo extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
+        try {
+            Thread.sleep(30000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         Intent intento= new Intent(context,MainActivity.class);
         intento.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intento);
 
         SharedPreferences mispreferencias=context.getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
-        String IP=mispreferencias.getString("edit_IP", "localhost");
+        String IP=mispreferencias.getString("edit_IP", "idirect.dlinkddns.com");
 
         int Puerto= Integer.parseInt(mispreferencias.getString("edit_Port", "9001"));
 
