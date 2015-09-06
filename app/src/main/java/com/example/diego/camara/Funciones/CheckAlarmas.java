@@ -1,18 +1,16 @@
 package com.example.diego.camara.Funciones;
 
 import android.content.Context;
-import android.media.MediaPlayer;
 import android.util.Log;
 
 /**
  * Created by Diego on 09/05/2015.
  */
-public class CheckAlarmas extends Thread {
+public class CheckAlarmas implements Runnable {
     Multimedia Audio;
     String Alarma,IpPublica,msg;
     ConexionIP ClienteTCP;
     int Puerto,IdRadiobase;
-    MediaPlayer mpIntrusion,mpApertura,mpSensorOn,mpSensorOff,mpEnergiaOn,mpEnergiaOff,mpPersonalNo,mpEnviandoInfo;
     Context contex;
     static  String TAG="Camara";
     Boolean audioBool=false;

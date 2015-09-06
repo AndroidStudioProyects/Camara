@@ -1,7 +1,9 @@
 package com.example.diego.camara.Services;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -22,17 +24,15 @@ public class KeepAlive  extends Service {
     Hilo hilito;
 
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        this.intento=intent;
+        SharedPreferences mispreferencias=getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
+         this.intento=intent;
         Bool=true;
-        IpPublica = intento.getExtras().getString("Ip");
-        IdRadiobase = intento.getExtras().getInt("Id");
-        PuertoKA=intento.getExtras().getInt("PuertoKA");
-       // Bool = intento.getExtras().getBoolean("boolKA");
-        TiempoSeg = intento.getExtras().getInt("Timer");
+        IpPublica = mispreferencias.getString("edit_IP", "idirect.dlinkddns.com");
+        IdRadiobase = Integer.parseInt(mispreferencias.getString("IdRadio", "1"));
+        PuertoKA=Integer.parseInt(mispreferencias.getString("edit_PortKA", "9002"));
+        TiempoSeg = Integer.parseInt(mispreferencias.getString("edit_TimerKA", "10"));
         hilito=new Hilo();
         hilito.start();
         Toast.makeText(getApplicationContext(), "Servicio Keep Alive iniciado", Toast.LENGTH_SHORT).show();
@@ -40,15 +40,12 @@ public class KeepAlive  extends Service {
       return START_STICKY;
     }
 
-
     @Override
     public void onDestroy() {
-
 
         Bool = false;
         Log.d(TAG, "KeepAlive Destroy bool: "+Bool);
         Toast.makeText(getApplicationContext(), "Servicio detenido: " + Bool, Toast.LENGTH_SHORT).show();
-
 
     }
 
@@ -59,8 +56,6 @@ public class KeepAlive  extends Service {
 
 
     public static class Hilo extends Thread {
-
-
 
         @Override
         public void run() {

@@ -14,7 +14,7 @@ import com.example.diego.camara.Funciones.ConexionIP;
  */
 public class SistemaEnergizado extends BroadcastReceiver {
     Context contexto;
-
+CheckAlarmas alarmas;
     ConexionIP ClienteTCP;
 
     @Override
@@ -31,9 +31,7 @@ public class SistemaEnergizado extends BroadcastReceiver {
 
        // ClienteTCP = new ConexionIP(IP, Puerto, " 1 6");
        // ClienteTCP.start();
-
-        CheckAlarmas CheckAlarmita = new CheckAlarmas(IdRadiobase, "6", IP, Puerto, context,audioBool);
-        CheckAlarmita.start();
-
+        alarmas = new CheckAlarmas(IdRadiobase, "4", IP, Puerto, context,audioBool);
+        alarmas.run();
     }
 }

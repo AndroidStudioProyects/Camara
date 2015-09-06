@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     ConnectedThread mConnectedThread;
     // SPP UUID service
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-
+    private static boolean BoolFoto=false;
     // MAC-address of Bluetooth module (you must edit this line)
     //private static String address = "00:14:01:06:13:29";
 
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     Intent intentKeepAlive;
     public ConnectUploadAsync cliente;
     String IpPublica;
-
+    CheckAlarmas alarmas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         LevantarXML();
         Botones();
+
 
         IdRadiobase = Integer.parseInt(edit_IdRadio.getText().toString());
         IpPublica=edit_IP.getText().toString();
@@ -128,13 +129,19 @@ public class MainActivity extends AppCompatActivity {
                         sb.append(strIncom);                                                // append string
                         int endOfLineIndex = sb.indexOf("\r\n");                            // determine the end-of-line
                         if (endOfLineIndex > 0) {                                            // if end-of-line,
+
                             String sbprint = sb.substring(0, endOfLineIndex);               // extract string
-                            Toast.makeText(getApplicationContext(),"Alarma:"+sbprint,Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(),"Alarma: '"+sbprint+"'",Toast.LENGTH_LONG).show();
+                            alarmas=new CheckAlarmas(IdRadiobase, "2",IpPublica, 9001, getApplicationContext(),audioBool);
+                            alarmas.run();
                             Alarmabluetooth=sbprint;
-                            textIn.setText(Alarmabluetooth);
+                           //      textIn.setText(Alarmabluetooth);
+
                             sb.delete(0, sb.length());                                      // and clear
-                            // Filmacion();
-                            //   mCamera.takePicture(null,null, mPicture);
+
+                            Log.d(TAG, "Alarma recibida: "+Alarmabluetooth);
+                            new ThFilmacion().run();
+
                         }
                         Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
                         break;
@@ -142,64 +149,24 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        new conetarBluetooth().run();
+
+        //// bluettohhh
+
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        new conetarBluetooth().run();
         Log.d(TAG, "OnResume ");
         CargarPreferencias();
+//// bluettohhh
 
 
-        //// bluettohhh
 
 
-        BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
-
-        // Two things are needed to make a connection:
-        //   A MAC address, which we got above.
-        //   A Service ID or UUID.  In this case we are using the
-        //     UUID for SPP.
-
-        try {
-            btSocket = createBluetoothSocket(device);
-        } catch (IOException e1) {
-            errorExit("Fatal Error", "In onResume() and socket create failed: " + e1.getMessage() + ".");
-        }
-
-        // Discovery is resource intensive.  Make sure it isn't going on
-        // when you attempt to connect and pass your message.
-        btAdapter.cancelDiscovery();
-
-        // Establish the connection.  This will block until it connects.
-        Log.d(TAG, "...Connecting...");
-        try {
-            btSocket.connect();
-            Log.d(TAG, "...Connection ok...");
-        } catch (IOException e) {
-            try {
-                btSocket.close();
-            } catch (IOException e2) {
-                errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
-            }
-        }
-
-        // Create a data stream so we can talk to server.
-        Log.d(TAG, "...Create Socket...");
-
-        try {
-            outStream = btSocket.getOutputStream();
-        } catch (IOException e) {
-            errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
-        }
-        mConnectedThread = new ConnectedThread(btSocket);
-        mConnectedThread.start();
-  }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "OnPause");
     }
 
     @Override
@@ -207,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         Log.d(TAG, "OnStop");
         GuardarPreferencias();
-     //   mCamera.startPreview();
+    //    mCamera.startPreview();
     }
 
     @Override
@@ -241,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
        mCamera = getCameraInstance();
        mPreview = new CameraPreview(getApplicationContext(), mCamera);
        preview.addView(mPreview);
+        mCamera.startPreview();
 
     }
 
@@ -280,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class ConnectedThread extends Thread {
+
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
@@ -335,11 +304,11 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                        Log.d(TAG, "Encender Led");
-                    mConnectedThread.write("1\n");
+                    mConnectedThread.write("1\r\n");
 
               } else {
                     Log.d(TAG, "Apagar Led");
-                    mConnectedThread.write("0\n");
+                    mConnectedThread.write("0\r\n");
                }
             }
         });
@@ -375,47 +344,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-
-                BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
-
-                // Two things are needed to make a connection:
-                //   A MAC address, which we got above.
-                //   A Service ID or UUID.  In this case we are using the
-                //     UUID for SPP.
-
-                try {
-                    btSocket = createBluetoothSocket(device);
-                } catch (IOException e1) {
-                    errorExit("Fatal Error", "In onResume() and socket create failed: " + e1.getMessage() + ".");
-                }
-
-                // Discovery is resource intensive.  Make sure it isn't going on
-                // when you attempt to connect and pass your message.
-                btAdapter.cancelDiscovery();
-
-                // Establish the connection.  This will block until it connects.
-                Log.d(TAG, "...Connecting...");
-                try {
-                    btSocket.connect();
-                    Log.d(TAG, "...Connection ok...");
-                } catch (IOException e) {
-                    try {
-                        btSocket.close();
-                    } catch (IOException e2) {
-                        errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
-                    }
-                }
-
-                // Create a data stream so we can talk to server.
-                Log.d(TAG, "...Create Socket...");
-
-                try {
-                    outStream = btSocket.getOutputStream();
-                } catch (IOException e) {
-                    errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
-                }
-                mConnectedThread = new ConnectedThread(btSocket);
-                mConnectedThread.start();
+                new conetarBluetooth().run();
 
             }
         });
@@ -423,12 +352,8 @@ public class MainActivity extends AppCompatActivity {
         btn_Foto.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-                mCamera.takePicture(null, null, mPicture);
-           //  EnviarFTP();
-                Log.d(TAG, "Boton de Foto");
-
+                            Log.d(TAG, "Boton de Foto");
+            mCamera.takePicture(null,null,mPicture);
 
             }
 
@@ -438,8 +363,8 @@ public class MainActivity extends AppCompatActivity {
         btn_Video.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-// initialize video camera
-                Filmacion();
+            //   Filmacion();
+            new ThFilmacion().run();
                 Log.d(TAG, "Boton de Video");
             }
         });
@@ -527,24 +452,15 @@ public class MainActivity extends AppCompatActivity {
                     IdRadiobase= Integer.parseInt(edit_IdRadio.getText().toString());
                     IpPublica=edit_IP.getText().toString();
 
-                    int Timer= Integer.parseInt(edit_TimerKA.getText().toString());
                     intentKeepAlive=new Intent(getApplicationContext(), KeepAlive.class);
-                    intentKeepAlive.putExtra("Id",IdRadiobase );
-                    intentKeepAlive.putExtra("Ip", IpPublica);
-                    intentKeepAlive.putExtra("PuertoKA", Integer.parseInt(edit_PortKA.getText().toString()));
-                    intentKeepAlive.putExtra("bool", true);
-                    intentKeepAlive.putExtra("Timer", Timer);
-                    startService(intentKeepAlive);
+                     intentKeepAlive.putExtra("bool", true);
+                     startService(intentKeepAlive);
                     BotonesEnabled(isChecked);
-
-
-
                 }else{
 
                     stopService(intentKeepAlive);
                     edit_TimerKA.setEnabled(true);
-                   // intentKeepAlive.putExtra("bool",false);
-                    BotonesEnabled(isChecked);
+                     BotonesEnabled(isChecked);
                 }
 
             }
@@ -566,15 +482,14 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d(TAG, "Tesxtin: " + textIn.getText().toString());
                 if(!textIn.getText().toString().equals("F")) {
-                    mCamera.takePicture(null, null, mPicture);
                     Log.d(TAG, "Alarmeta");
                     String IP = edit_IP.getText().toString();
                     int Port = Integer.parseInt(edit_Port.getText().toString());
                     int IdRadiobase = Integer.parseInt(edit_IdRadio.getText().toString());
                     Log.d(TAG, "IdRadiobase:" + IdRadiobase);
                     String Alarma = textIn.getText().toString();
-                    CheckAlarmas CheckAlarmita = new CheckAlarmas(IdRadiobase, Alarma, IP, Port, getApplicationContext(),audioBool);
-                    CheckAlarmita.start();
+                    alarmas= new CheckAlarmas(IdRadiobase, Alarma, IP, Port, getApplicationContext(),audioBool);
+                    alarmas.run();
                     textIn.setText("F");
                 }
             }
@@ -785,10 +700,12 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void releaseCamera(){
+        mCamera.stopPreview();
         if (mCamera != null){
             mCamera.release();        // release the camera for other applications
             mCamera = null;
             Log.d(TAG, "Camara Liberada");
+
         }
     }
 
@@ -968,37 +885,123 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void FuncionKA(Boolean bolka){
+
+    public class classThFoto implements  Runnable{
 
 
-    if(bolka){
-        IdRadiobase= Integer.parseInt(edit_IdRadio.getText().toString());
-        IpPublica=edit_IP.getText().toString();
-
-        int Timer= Integer.parseInt(edit_TimerKA.getText().toString());
-        intentKeepAlive=new Intent(getApplicationContext(), KeepAlive.class);
-        intentKeepAlive.putExtra("Id",IdRadiobase );
-        intentKeepAlive.putExtra("Ip", IpPublica);
-        intentKeepAlive.putExtra("PuertoKA", Integer.parseInt(edit_PortKA.getText().toString()));
-        intentKeepAlive.putExtra("bool",true);
-        intentKeepAlive.putExtra("Timer", Timer);
-        startService(intentKeepAlive);
-
-    }else{
-        stopService(intentKeepAlive);
-        edit_TimerKA.setEnabled(true);
-        //intentKeepAlive.putExtra("bool", false);
+        public void run() {
 
 
+
+            mCamera.takePicture(null, null, mPicture);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+
+        }
     }
 
 
+
+    public class ThFilmacion implements Runnable{
+
+
+        public void run() {
+
+            if (prepareVideoRecorder()) {
+                // Camera is available and unlocked, MediaRecorder is prepared,
+                // now you can start recording
+
+                mMediaRecorder.start();
+                Log.d(TAG, "Filmacion Comenzada");
+
+                // inform the user that recording has started
+                btn_Video.setText("Stop");
+                isRecording = true;
+            } else {
+                // prepare didn't work, release the camera
+                releaseMediaRecorder();
+                Log.d(TAG, "Se libero el MadiaRecorder");
+
+                // inform user
+            }
+            try {
+                Thread.sleep(6000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+             if (isRecording) {
+                // stop recording and release camera
+                mMediaRecorder.stop();  // stop the recording
+                releaseMediaRecorder(); // release the MediaRecorder object
+                mCamera.lock();         // take camera access back from MediaRecorder
+
+                // inform the user that recording has stopped
+
+                isRecording = false;
+                Log.d(TAG, "Filmacion Detenida");
+
+            }
+
+
+
+        }
+    }
+
+    public class conetarBluetooth implements Runnable{
+
+      //  @Override
+        public void run() {
+
+            BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
+
+            // Two things are needed to make a connection:
+            //   A MAC address, which we got above.
+            //   A Service ID or UUID.  In this case we are using the
+            //     UUID for SPP.
+
+            try {
+                btSocket = createBluetoothSocket(device);
+            } catch (IOException e1) {
+                errorExit("Fatal Error", "In onResume() and socket create failed: " + e1.getMessage() + ".");
+            }
+
+            // Discovery is resource intensive.  Make sure it isn't going on
+            // when you attempt to connect and pass your message.
+            btAdapter.cancelDiscovery();
+
+
+            // Establish the connection.  This will block until it connects.
+            Log.d(TAG, "...Connecting...");
+            try {
+                btSocket.connect();
+                Log.d(TAG, "...Connection ok...");
+            } catch (IOException e) {
+                try {
+                    btSocket.close();
+                } catch (IOException e2) {
+                    errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
+                }
+            }
+
+            // Create a data stream so we can talk to server.
+            Log.d(TAG, "...Create Socket...");
+
+            try {
+                outStream = btSocket.getOutputStream();
+            } catch (IOException e) {
+                errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
+            }
+            mConnectedThread = new ConnectedThread(btSocket);
+            mConnectedThread.start();
+        }
+    }
 }
 
 
 
-
-
-}
 
 
