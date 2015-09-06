@@ -3,8 +3,10 @@ package com.example.diego.camara.Actividades;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
@@ -117,7 +119,16 @@ public class MainActivity extends AppCompatActivity {
         ////defino bluetooth adapter
         btAdapter=BluetoothAdapter.getDefaultAdapter();
         checkBTState();//Checkeo el estado
-        Log.d(TAG, "OnCreate fin");
+
+/// BroadcastReceiver  Bluettoth
+
+        IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
+        IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+        IntentFilter filter3 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+
+        this.registerReceiver(mReceiver, filter1);
+        this.registerReceiver(mReceiver, filter2);
+        this.registerReceiver(mReceiver, filter3);
 
 
         h = new Handler() {
@@ -151,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
 
         new conetarBluetooth().run();
 
-        //// bluettohhh
+        Log.d(TAG, "OnCreate fin");
 
 
     }
@@ -999,6 +1010,43 @@ public class MainActivity extends AppCompatActivity {
             mConnectedThread.start();
         }
     }
+
+
+
+    //The BroadcastReceiver that listens for bluetooth broadcasts
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            BluetoothDevice device;
+
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                //Device found
+
+                Toast.makeText(getApplicationContext(),"Device found",Toast.LENGTH_SHORT).show();
+            }
+            else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                //Device is now connected
+                Toast.makeText(getApplicationContext(),"Device is now connected",Toast.LENGTH_SHORT).show();
+
+            }
+
+
+            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
+                //Device is about to disconnect
+                Toast.makeText(getApplicationContext(),"Device is about to disconnect",Toast.LENGTH_SHORT).show();
+
+            }
+            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                //Device has disconnected
+                Toast.makeText(getApplicationContext(),"Device has disconnected",Toast.LENGTH_SHORT).show();
+                new  conetarBluetooth().run();
+
+            }
+        }
+    };
+
+
 }
 
 
