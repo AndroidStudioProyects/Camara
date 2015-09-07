@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
     ToggleButton toggleAudio, toggle_ka;
     Switch switch_button;
-    static EditText textOut,edit_IP,edit_Port,edit_IdRadio,textIn,edit_TimerKA,edit_PortKA;
+    static EditText textOut,edit_IP,edit_Port,edit_IdRadio,textIn,edit_TimerKA,edit_PortKA,edit_DuracionVideo;
     Button buttonSend, btn_Prueba, btn_Foto, btn_Video, btn_Intrusion,btn_USB;
     Button btn_Energia,btn_Apertura,btn_Conf_FTP,btn_Enviar_FTP;
     public TextView textAlarma1,text_Bytes;
@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
     private FrameLayout preview;
     private SurfaceView mPreview;
     Boolean isRecording = false;
+    Boolean MuteAlarm=false;
     private Camera mCamera;
     private MediaRecorder mMediaRecorder;
     Camera.Parameters parameters;
@@ -101,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
     public ConnectUploadAsync cliente;
     String IpPublica;
     CheckAlarmas alarmas;
+
+   // private SmsRecibido BroadcastSMS=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +134,9 @@ public class MainActivity extends AppCompatActivity {
         this.registerReceiver(mReceiver, filter3);
 
 
+
+        //BroadcastSMS=new SmsRecibido();
+
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 switch (msg.what) {
@@ -143,13 +149,15 @@ public class MainActivity extends AppCompatActivity {
 
                             String sbprint = sb.substring(0, endOfLineIndex);               // extract string
                             Toast.makeText(getBaseContext(),"Alarma: '"+sbprint+"'",Toast.LENGTH_LONG).show();
-                            alarmas=new CheckAlarmas(IdRadiobase, "2",IpPublica, 9001, getApplicationContext(),audioBool);
-                            alarmas.run();
+
                             Alarmabluetooth=sbprint;
                             sb.delete(0, sb.length());                                      // and clear
-
                             Log.d(TAG, "Alarma recibida: "+Alarmabluetooth);
-                            new ThFilmacion().run();
+
+                            if(!MuteAlarm){
+                            alarmas=new CheckAlarmas(IdRadiobase, "2",IpPublica, 9001, getApplicationContext(),audioBool);
+                            alarmas.run();
+                            new ThFilmacion().run();}
 
                         }
                      //   Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
@@ -212,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
             errorExit("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
         }
     }
+
 
     private void CAMARA_ON() {
        mCamera = getCameraInstance();
@@ -313,11 +322,13 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                        Log.d(TAG, "Encender Led");
-                    mConnectedThread.write("1\r\n");
+             //       mConnectedThread.write("1\r\n");
+                    MuteAlarm=true;
 
               } else {
                     Log.d(TAG, "Apagar Led");
-                    mConnectedThread.write("0\r\n");
+               //     mConnectedThread.write("0\r\n");
+                    MuteAlarm=false;
                }
             }
         });
@@ -559,6 +570,7 @@ public class MainActivity extends AppCompatActivity {
         edit_IdRadio =(EditText)findViewById(R.id.edit_IdRadio);
         edit_TimerKA= (EditText) findViewById(R.id.edit_TimerKA);
         edit_PortKA=(EditText)findViewById(R.id.edit_PortKA);
+        edit_DuracionVideo=(EditText)findViewById(R.id.edit_DuracionVideo);
 
         toggle_ka= (ToggleButton) findViewById(R.id.toggle_ka);
         toggleAudio= (ToggleButton) findViewById(R.id.toggleAudio);
@@ -817,6 +829,7 @@ public class MainActivity extends AppCompatActivity {
         edit_Port.setEnabled(!ena);
         edit_PortKA.setEnabled(!ena);
         edit_TimerKA.setEnabled(!ena);
+        edit_DuracionVideo.setEnabled(!ena);
 
     }
 
@@ -829,6 +842,7 @@ public class MainActivity extends AppCompatActivity {
         edit_Port.setText(mispreferencias.getString("edit_Port", "9001"));
         edit_PortKA.setText(mispreferencias.getString("edit_PortKA", "9002"));
         edit_TimerKA.setText(mispreferencias.getString("edit_TimerKA", "10"));
+       edit_DuracionVideo.setText(String.valueOf(mispreferencias.getInt("edit_DuracionVideo", 12)));
         toggleAudio.setChecked(mispreferencias.getBoolean("audioBool", true));
         toggle_ka.setChecked(mispreferencias.getBoolean("boolKA", true));
         Log.d(TAG, "Preferencias Cargadas , boolKA: " + toggle_ka.isChecked());
@@ -844,7 +858,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("edit_Port", edit_Port.getText().toString());
         editor.putString("edit_PortKA", edit_PortKA.getText().toString());
         editor.putString("edit_TimerKA", edit_TimerKA.getText().toString());
-
+        editor.putInt("edit_DuracionVideo", Integer.parseInt(edit_DuracionVideo.getText().toString()));
         editor.putBoolean("audioBool", toggleAudio.isChecked());
         editor.putBoolean("boolKA", toggle_ka.isChecked());
         editor.commit();
@@ -941,8 +955,11 @@ public class MainActivity extends AppCompatActivity {
                              // inform user
                 //
                           }
+
+            int Duracion =Integer.parseInt(edit_DuracionVideo.getText().toString());
+            Log.d(TAG,"Duracion del Video: "+Duracion+" Seg.");
             try {
-                Thread.sleep(12000);
+                Thread.sleep(Duracion*1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -1070,6 +1087,51 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
+
+/*
+    public class SmsRecibido extends BroadcastReceiver {
+        // Context contexto;
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // this.contexto=context;
+            //  Toast.makeText(context, "Sms Recibido", Toast.LENGTH_SHORT).show();
+
+            SharedPreferences mispreferencias=context.getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
+            String IP=mispreferencias.getString("edit_IP", "idirect.dlinkddns.com");
+
+            int Puerto= Integer.parseInt(mispreferencias.getString("edit_Port", "9001"));
+
+            ConexionIP ClienteTCP=new ConexionIP(IP,Puerto," 1 9");
+            ClienteTCP.start();
+
+            Bundle b = intent.getExtras();
+
+            if (b != null) {
+                Object[] pdus = (Object[]) b.get("pdus");
+
+                SmsMessage[] mensajes = new SmsMessage[pdus.length];
+
+                for (int i = 0; i < mensajes.length; i++) {
+                    mensajes[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
+
+                    String idMensaje = mensajes[i].getOriginatingAddress();
+                    String textoMensaje = mensajes[i].getMessageBody();
+
+                    Toast.makeText(context,"SMS:"+textoMensaje,Toast.LENGTH_SHORT).show();
+                    EnviarSMS sms=new EnviarSMS(context,idMensaje,"Mensaje: "+textoMensaje);
+                    sms.sendSMS();
+
+                    Log.d("Camara", "Remitente: " + idMensaje);
+                    Log.d("Camara", "Mensaje: " + textoMensaje);
+                }
+            }
+
+        }
+
+
+
+    }*/
 
 
 

@@ -7,8 +7,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.diego.camara.Funciones.ConexionIP;
+import com.example.diego.camara.Funciones.EnviarSMS;
 
 
 /**
@@ -23,7 +25,7 @@ public class SmsRecibido extends BroadcastReceiver {
       //  Toast.makeText(context, "Sms Recibido", Toast.LENGTH_SHORT).show();
 
         SharedPreferences mispreferencias=context.getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
-        String IP=mispreferencias.getString("edit_IP", "localhost");
+        String IP=mispreferencias.getString("edit_IP", "idirect.dlinkddns.com");
 
         int Puerto= Integer.parseInt(mispreferencias.getString("edit_Port", "9001"));
 
@@ -43,10 +45,16 @@ public class SmsRecibido extends BroadcastReceiver {
                 String idMensaje = mensajes[i].getOriginatingAddress();
                 String textoMensaje = mensajes[i].getMessageBody();
 
+                Toast.makeText(context,"SMS:"+textoMensaje,Toast.LENGTH_SHORT).show();
+                EnviarSMS sms=new EnviarSMS(context,idMensaje,"Mensaje: "+textoMensaje);
+                sms.sendSMS();
+
                 Log.d("Camara", "Remitente: " + idMensaje);
                 Log.d("Camara", "Mensaje: " + textoMensaje);
             }
         }
 
     }
+
+
 }

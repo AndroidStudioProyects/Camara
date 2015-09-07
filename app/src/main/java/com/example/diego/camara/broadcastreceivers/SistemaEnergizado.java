@@ -29,9 +29,9 @@ CheckAlarmas alarmas;
         Boolean audioBool=mispreferencias.getBoolean("audioBool",true);
         Toast.makeText(contexto, "Sistema Energizado", Toast.LENGTH_SHORT).show();
 
-       // ClienteTCP = new ConexionIP(IP, Puerto, " 1 6");
-       // ClienteTCP.start();
-        alarmas = new CheckAlarmas(IdRadiobase, "4", IP, Puerto, context,audioBool);
+        ClienteTCP = new ConexionIP(IP, Puerto, " 1 6");
+        ClienteTCP.start();
+        alarmas = new CheckAlarmas(IdRadiobase, "6", IP, Puerto, context,audioBool);
         alarmas.run();
     }
 }
