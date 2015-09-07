@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
     static final String TAG = "Camara";
     boolean audioBool=false;
-    int  IdRadiobase=0;
+     public static int  IdRadiobase=0;
     Intent intentKeepAlive;
     public ConnectUploadAsync cliente;
     String IpPublica;
@@ -146,15 +146,13 @@ public class MainActivity extends AppCompatActivity {
                             alarmas=new CheckAlarmas(IdRadiobase, "2",IpPublica, 9001, getApplicationContext(),audioBool);
                             alarmas.run();
                             Alarmabluetooth=sbprint;
-                           //      textIn.setText(Alarmabluetooth);
-
                             sb.delete(0, sb.length());                                      // and clear
 
                             Log.d(TAG, "Alarma recibida: "+Alarmabluetooth);
                             new ThFilmacion().run();
 
                         }
-                        Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
+                     //   Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
                         break;
                 }
             }
@@ -384,6 +382,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+
+
+                    Toast.makeText(getApplicationContext(),"Conexion?="+ btSocket.isConnected(),Toast.LENGTH_LONG).show();
+
 
             }
         });
@@ -936,26 +938,31 @@ public class MainActivity extends AppCompatActivity {
                 // prepare didn't work, release the camera
                 releaseMediaRecorder();
                 Log.d(TAG, "Se libero el MadiaRecorder");
-
-                // inform user
-            }
+                             // inform user
+                //
+                          }
             try {
-                Thread.sleep(6000);
+                Thread.sleep(12000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
              if (isRecording) {
                 // stop recording and release camera
-                mMediaRecorder.stop();  // stop the recording
-                releaseMediaRecorder(); // release the MediaRecorder object
-                mCamera.lock();         // take camera access back from MediaRecorder
+                 mMediaRecorder.stop();  // stop the recording
+                 releaseMediaRecorder(); // release the MediaRecorder object
+                 mCamera.lock();         // take camera access back from MediaRecorder
+
 
                 // inform the user that recording has stopped
 
                 isRecording = false;
-                Log.d(TAG, "Filmacion Detenida");
+
+
+                 Log.d(TAG,"filmacion detenida y en proceso de envio");
 
             }
+
+            EnviarFTP();
 
 
 
@@ -989,6 +996,10 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "...Connecting...");
             try {
                 btSocket.connect();
+
+
+                Toast.makeText(getApplicationContext(),"se conectoooo",Toast.LENGTH_SHORT).show();
+
                 Log.d(TAG, "...Connection ok...");
             } catch (IOException e) {
                 try {
@@ -1018,7 +1029,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            BluetoothDevice device;
 
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 //Device found
@@ -1032,11 +1042,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
-                //Device is about to disconnect
-                Toast.makeText(getApplicationContext(),"Device is about to disconnect",Toast.LENGTH_SHORT).show();
-
-            }
             else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
                 //Device has disconnected
                 Toast.makeText(getApplicationContext(),"Device has disconnected",Toast.LENGTH_SHORT).show();
@@ -1045,6 +1050,27 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+
+        public class FTP  implements Runnable{
+
+
+            String ip=IpPublica;
+            String userName="idirect";
+            String pass="IDIRECT";
+
+
+
+            public void run() {
+
+
+                cliente = new ConnectUploadAsync(getApplicationContext(),ip,userName,pass,MainActivity.this);
+                cliente.execute();
+
+
+            }
+        }
+
 
 
 }

@@ -17,7 +17,7 @@ public class ConexionIP extends Thread {
     int Puerto ;
     String msg,Ip;
 
-    String TAG="ConexionIP";
+    String TAG="Camara";
 
     public ConexionIP(String Ip,int Puerto,String msg) {
 
@@ -32,6 +32,7 @@ public class ConexionIP extends Thread {
         try {
             Socket socket;
             //Create a client socket and define internet address and the port of the server
+            Log.d(TAG," ip: "+Ip+" Puerto: "+Puerto);
             socket = new Socket(Ip,Puerto);
             //Get the input stream of the client socket
         //    InputStream is = socket.getInputStream();

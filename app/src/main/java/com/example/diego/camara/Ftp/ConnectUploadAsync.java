@@ -35,6 +35,7 @@ public class ConnectUploadAsync extends AsyncTask<Void,Integer,Boolean> {
     boolean done;
     String Errores=null;
     File fileLast;
+    int IdRadio;
     String ip, userName,pass;
     MainActivity ac;
 
@@ -46,13 +47,15 @@ public class ConnectUploadAsync extends AsyncTask<Void,Integer,Boolean> {
         this.pass=pass;
 
         this.ac=ac;
-
+        this.IdRadio=ac.IdRadiobase;
 
     }
 
 
     @Override
     protected Boolean doInBackground(Void... params) {
+
+
 
         try {
             mFtpClient = new FTPClient();
@@ -66,20 +69,17 @@ public class ConnectUploadAsync extends AsyncTask<Void,Integer,Boolean> {
 
                 FTPFile[] mFileArray = mFtpClient.listFiles();
 
-              //  Log.d("Api FTP", "Numeros de archivos" + String.valueOf(mFileArray.length));
+                Log.d("Camara", "Numeros de archivos" + String.valueOf(mFileArray.length));
 
                 for(int i=0;i<mFileArray.length;i++){
-               //     Log.d("Api FTP", "nombre archivo" + mFileArray[i].getName());
+                  Log.d("Camara", "nombre archivo" + mFileArray[i].getName());
                   }
-
-                Log.d("Api FTP", "IP Server:" + String.valueOf(mFtpClient.getRemoteAddress()));
-
 
 
                 // APPROACH #2: uploads second file using an OutputStream
 
                 //Defino la ruta donde busco los ficheros
-                File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/Radiobases/");
+                File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/Radiobases");
                 //Creo el array de tipo File con el contenido de la carpeta
                 File[] files = f.listFiles();
 
@@ -90,7 +90,7 @@ public class ConnectUploadAsync extends AsyncTask<Void,Integer,Boolean> {
                     File file = files[i];
 
                     //Si es directorio...
-              //     System.out.println("[" + i + "]" + file.getName());
+                   System.out.println("[" + i + "]" + file.getName());
                 }
 
         try {  fileLast = files[files.length-1];
@@ -110,7 +110,16 @@ public class ConnectUploadAsync extends AsyncTask<Void,Integer,Boolean> {
 
             System.out.println("Start uploading second file");
 
-            OutputStream outputStream = mFtpClient.storeFileStream(secondRemoteFile);
+
+            boolean created=mFtpClient.makeDirectory("Radiobase_ID_"+IdRadio);
+            if(created){
+
+            }else{
+
+            }
+
+
+            OutputStream outputStream = mFtpClient.storeFileStream("Radiobase_ID_"+IdRadio+"/"+secondRemoteFile);
 
             int ancho = (int) secondLocalFile.length();
 
