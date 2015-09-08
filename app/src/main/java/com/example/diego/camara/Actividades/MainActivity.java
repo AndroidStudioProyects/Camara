@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.SmsMessage;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -39,6 +40,8 @@ import android.widget.ToggleButton;
 
 import com.example.diego.camara.Ftp.ConnectUploadAsync;
 import com.example.diego.camara.Funciones.CheckAlarmas;
+import com.example.diego.camara.Funciones.ConexionIP;
+import com.example.diego.camara.Funciones.EnviarSMS;
 import com.example.diego.camara.R;
 import com.example.diego.camara.Services.KeepAlive;
 
@@ -94,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
     private int calidadFoto = 90;
-
+    public static Boolean Bandera=false;
     static final String TAG = "Camara";
     boolean audioBool=false;
      public static int  IdRadiobase=0;
@@ -103,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     String IpPublica;
     CheckAlarmas alarmas;
 
-   // private SmsRecibido BroadcastSMS=null;
+    private BroadcastReceiver SmsRecibido ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        //BroadcastSMS=new SmsRecibido();
+
 
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
@@ -166,12 +169,115 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        new conetarBluetooth().run();
 
+        BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
+
+        // Two things are needed to make a connection:
+        //   A MAC address, which we got above.
+        //   A Service ID or UUID.  In this case we are using the
+        //     UUID for SPP.
+
+        try {
+            btSocket = createBluetoothSocket(device);
+        } catch (IOException e1) {
+            errorExit("Fatal Error", "In onResume() and socket create failed: " + e1.getMessage() + ".");
+        }
+
+        // Discovery is resource intensive.  Make sure it isn't going on
+        // when you attempt to connect and pass your message.
+        btAdapter.cancelDiscovery();
+
+
+        // Establish the connection.  This will block until it connects.
+        Log.d(TAG, "...Connecting...");
+        try {
+            btSocket.connect();
+
+
+            Toast.makeText(getApplicationContext(),"se conectoooo",Toast.LENGTH_SHORT).show();
+
+            Log.d(TAG, "...Connection ok...");
+        } catch (IOException e) {
+            try {
+                btSocket.close();
+            } catch (IOException e2) {
+                errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
+            }
+        }
+
+        // Create a data stream so we can talk to server.
+        Log.d(TAG, "...Create Socket...");
+
+        try {
+            outStream = btSocket.getOutputStream();
+        } catch (IOException e) {
+            errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
+        }
+        mConnectedThread = new ConnectedThread(btSocket);
+        mConnectedThread.start();
         Log.d(TAG, "OnCreate fin");
 
+       BroadcastSMS();
 
     }
+
+    private void BroadcastSMS() {
+
+        SmsRecibido=new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                //           Toast.makeText(context,"BroadcasrReceiver",Toast.LENGTH_SHORT).show();
+                final Bundle bundle = intent.getExtras();
+
+                try {
+                    if(bundle != null){
+
+                        final Object[] pdusObj = (Object[]) bundle.get("pdus");
+
+                        for(int i = 0; i < pdusObj.length; i++){
+                            SmsMessage currentMessage = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
+                            String phoneNumber = currentMessage.getDisplayOriginatingAddress();
+                            String senderNum = phoneNumber;
+                            String message = currentMessage.getDisplayMessageBody();
+                            int Comando = 0;
+                            try{
+                                Comando=Integer.parseInt(message);
+
+                            }catch (Exception e){
+
+                                Toast.makeText(context,"Mensaje mal escrito", Toast.LENGTH_SHORT).show();
+                            }
+
+                            switch (Comando){
+
+                                case 1:  Toast.makeText(context,"Comando: 1", Toast.LENGTH_SHORT).show();
+                                    ThFilmacion filmar=new ThFilmacion();
+                                    filmar.run();
+
+                                    break;
+                                case 2:  Toast.makeText(context,"Comando: 2", Toast.LENGTH_SHORT).show();
+                                    new conetarBluetooth().run();
+                                    break;
+                                default:   Toast.makeText(context,"Comando Inexistente", Toast.LENGTH_SHORT).show();
+                                    break;
+
+                            }
+
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e("SmsReceiver", "Exception smsReceiver" + e);
+                }
+
+            }
+        };
+
+        registerReceiver(SmsRecibido, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
+
+}
+
+
 
     @Override
     public void onResume() {
@@ -180,9 +286,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "OnResume ");
         CargarPreferencias();
 //// bluettohhh
-
-
-
 
     }
 
@@ -913,26 +1016,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public class classThFoto implements  Runnable{
-
-
-        public void run() {
-
-
-
-            mCamera.takePicture(null, null, mPicture);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-
-        }
-    }
-
-
-
     public class ThFilmacion implements Runnable{
 
 
@@ -988,7 +1071,7 @@ public class MainActivity extends AppCompatActivity {
 
     public class conetarBluetooth implements Runnable{
 
-      //  @Override
+        @Override
         public void run() {
 
             BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
@@ -1056,6 +1139,9 @@ public class MainActivity extends AppCompatActivity {
                 //Device is now connected
                 Toast.makeText(getApplicationContext(),"Device is now connected",Toast.LENGTH_SHORT).show();
 
+                EnviarSMS sms=new EnviarSMS(context,"2235776581","Bluetooth Conectado");
+                sms.sendSMS();
+
             }
 
 
@@ -1063,75 +1149,16 @@ public class MainActivity extends AppCompatActivity {
                 //Device has disconnected
                 Toast.makeText(getApplicationContext(),"Device has disconnected",Toast.LENGTH_SHORT).show();
                 new  conetarBluetooth().run();
+                ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," 1 5");
+                ClienteTCP.start();
+                EnviarSMS sms=new EnviarSMS(context,"2235776581","Bluetooth Desconectado");
+                sms.sendSMS();
+
 
             }
         }
     };
 
-
-        public class FTP  implements Runnable{
-
-
-            String ip=IpPublica;
-            String userName="idirect";
-            String pass="IDIRECT";
-
-
-
-            public void run() {
-
-
-                cliente = new ConnectUploadAsync(getApplicationContext(),ip,userName,pass,MainActivity.this);
-                cliente.execute();
-
-
-            }
-        }
-
-/*
-    public class SmsRecibido extends BroadcastReceiver {
-        // Context contexto;
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // this.contexto=context;
-            //  Toast.makeText(context, "Sms Recibido", Toast.LENGTH_SHORT).show();
-
-            SharedPreferences mispreferencias=context.getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
-            String IP=mispreferencias.getString("edit_IP", "idirect.dlinkddns.com");
-
-            int Puerto= Integer.parseInt(mispreferencias.getString("edit_Port", "9001"));
-
-            ConexionIP ClienteTCP=new ConexionIP(IP,Puerto," 1 9");
-            ClienteTCP.start();
-
-            Bundle b = intent.getExtras();
-
-            if (b != null) {
-                Object[] pdus = (Object[]) b.get("pdus");
-
-                SmsMessage[] mensajes = new SmsMessage[pdus.length];
-
-                for (int i = 0; i < mensajes.length; i++) {
-                    mensajes[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
-
-                    String idMensaje = mensajes[i].getOriginatingAddress();
-                    String textoMensaje = mensajes[i].getMessageBody();
-
-                    Toast.makeText(context,"SMS:"+textoMensaje,Toast.LENGTH_SHORT).show();
-                    EnviarSMS sms=new EnviarSMS(context,idMensaje,"Mensaje: "+textoMensaje);
-                    sms.sendSMS();
-
-                    Log.d("Camara", "Remitente: " + idMensaje);
-                    Log.d("Camara", "Mensaje: " + textoMensaje);
-                }
-            }
-
-        }
-
-
-
-    }*/
 
 
 

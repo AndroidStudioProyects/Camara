@@ -21,8 +21,6 @@ public class SmsRecibido extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-       // this.contexto=context;
-      //  Toast.makeText(context, "Sms Recibido", Toast.LENGTH_SHORT).show();
 
         SharedPreferences mispreferencias=context.getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
         String IP=mispreferencias.getString("edit_IP", "idirect.dlinkddns.com");
@@ -46,7 +44,7 @@ public class SmsRecibido extends BroadcastReceiver {
                 String textoMensaje = mensajes[i].getMessageBody();
 
                 Toast.makeText(context,"SMS:"+textoMensaje,Toast.LENGTH_SHORT).show();
-                EnviarSMS sms=new EnviarSMS(context,idMensaje,"Mensaje: "+textoMensaje);
+               EnviarSMS sms=new EnviarSMS(context,idMensaje,"Mensaje: "+textoMensaje);
                 sms.sendSMS();
 
                 Log.d("Camara", "Remitente: " + idMensaje);
