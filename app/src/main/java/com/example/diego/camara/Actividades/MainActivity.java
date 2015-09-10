@@ -59,7 +59,10 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
+// sms
+    EnviarSMS sms;
             //   BLUETOOTH !
+
     private StringBuilder sb= new StringBuilder();
     final int RECIEVE_MESSAGE=1;
     private BluetoothAdapter btAdapter = null;
@@ -79,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     // BLUETOOTH FIN
 
     ToggleButton toggleAudio, toggle_ka;
-    Switch switch_button;
+    Switch switch_muteAlarm;
     static EditText textOut,edit_IP,edit_Port,edit_IdRadio,textIn,edit_TimerKA,edit_PortKA,edit_DuracionVideo;
     Button buttonSend, btn_Prueba, btn_Foto, btn_Video, btn_Intrusion,btn_USB;
     Button btn_Energia,btn_Apertura,btn_Conf_FTP,btn_Enviar_FTP;
@@ -105,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
     public ConnectUploadAsync cliente;
     String IpPublica;
     CheckAlarmas alarmas;
+
+    public static final String Diego="2235776581";
 
     private BroadcastReceiver SmsRecibido ;
 
@@ -136,6 +141,8 @@ public class MainActivity extends AppCompatActivity {
         this.registerReceiver(mReceiver, filter2);
         this.registerReceiver(mReceiver, filter3);
 
+
+        BroadcastSMS();
 
 
 
@@ -169,8 +176,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-
         BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
+
 
         // Two things are needed to make a connection:
         //   A MAC address, which we got above.
@@ -217,72 +224,12 @@ public class MainActivity extends AppCompatActivity {
         mConnectedThread.start();
         Log.d(TAG, "OnCreate fin");
 
-       BroadcastSMS();
-
     }
-
-    private void BroadcastSMS() {
-
-        SmsRecibido=new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                //           Toast.makeText(context,"BroadcasrReceiver",Toast.LENGTH_SHORT).show();
-                final Bundle bundle = intent.getExtras();
-
-                try {
-                    if(bundle != null){
-
-                        final Object[] pdusObj = (Object[]) bundle.get("pdus");
-
-                        for(int i = 0; i < pdusObj.length; i++){
-                            SmsMessage currentMessage = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
-                            String phoneNumber = currentMessage.getDisplayOriginatingAddress();
-                            String senderNum = phoneNumber;
-                            String message = currentMessage.getDisplayMessageBody();
-                            int Comando = 0;
-                            try{
-                                Comando=Integer.parseInt(message);
-
-                            }catch (Exception e){
-
-                                Toast.makeText(context,"Mensaje mal escrito", Toast.LENGTH_SHORT).show();
-                            }
-
-                            switch (Comando){
-
-                                case 1:  Toast.makeText(context,"Comando: 1", Toast.LENGTH_SHORT).show();
-                                    ThFilmacion filmar=new ThFilmacion();
-                                    filmar.run();
-
-                                    break;
-                                case 2:  Toast.makeText(context,"Comando: 2", Toast.LENGTH_SHORT).show();
-                                    new conetarBluetooth().run();
-                                    break;
-                                default:   Toast.makeText(context,"Comando Inexistente", Toast.LENGTH_SHORT).show();
-                                    break;
-
-                            }
-
-                        }
-                    }
-                } catch (Exception e) {
-                    Log.e("SmsReceiver", "Exception smsReceiver" + e);
-                }
-
-            }
-        };
-
-        registerReceiver(SmsRecibido, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
-
-}
-
-
 
     @Override
     public void onResume() {
         super.onResume();
-        new conetarBluetooth().run();
+       new conetarBluetooth().run();
         Log.d(TAG, "OnResume ");
         CargarPreferencias();
 //// bluettohhh
@@ -300,11 +247,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," 1 17");
+        ClienteTCP.start();
         Log.d(TAG, "OnDestroy");
         releaseMediaRecorder();       // if you are using MediaRecorder, release it first
         releaseCamera();              // release the camera immediately on pause event
-
-
+        MuteAlarm=false;
         /// bluetooth
 
         //
@@ -323,7 +271,6 @@ public class MainActivity extends AppCompatActivity {
             errorExit("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
         }
     }
-
 
     private void CAMARA_ON() {
        mCamera = getCameraInstance();
@@ -420,19 +367,27 @@ public class MainActivity extends AppCompatActivity {
     ///////////////7//   //////////////////
     private void Botones() {
 
-        switch_button.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        switch_muteAlarm.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
                 if (isChecked) {
-                       Log.d(TAG, "Encender Led");
-             //       mConnectedThread.write("1\r\n");
+                    Log.d(TAG, "Sensores Desactivados");
                     MuteAlarm=true;
+                    alarmas=new CheckAlarmas(IdRadiobase, "8",IpPublica, 9001, getApplicationContext(),audioBool);
+                    alarmas.run();
+                    sms=new EnviarSMS(getApplicationContext(),Diego,"Sensores Desactivados");
+                    sms.sendSMS();
 
               } else {
-                    Log.d(TAG, "Apagar Led");
-               //     mConnectedThread.write("0\r\n");
                     MuteAlarm=false;
-               }
+                    Log.d(TAG, "Sensores Activados");
+                    alarmas=new CheckAlarmas(IdRadiobase, "7",IpPublica, 9001, getApplicationContext(),audioBool);
+                    alarmas.run();
+                    sms=new EnviarSMS(getApplicationContext(),Diego,"Sensores Activados");
+                    sms.sendSMS();
+                    }
+                GuardarPreferencias();
             }
         });
 
@@ -689,7 +644,7 @@ public class MainActivity extends AppCompatActivity {
         btn_Enviar_FTP=(Button) findViewById(R.id.btn_Enviar_FTP);
         btn_USB=(Button) findViewById(R.id.btn_USB);
 
-        switch_button = (Switch) findViewById(R.id.switch_Alarma);
+        switch_muteAlarm = (Switch) findViewById(R.id.switch_Alarma);
 
         preview = (FrameLayout) findViewById(R.id.camera_preview);
         mPreview = (SurfaceView) findViewById(R.id.surfaceView);
@@ -850,7 +805,7 @@ public class MainActivity extends AppCompatActivity {
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
 
-        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
+        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_QVGA));
 
         // Step 4: Set output file
         mMediaRecorder.setOutputFile(getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
@@ -913,7 +868,7 @@ public class MainActivity extends AppCompatActivity {
                     "Radiobase_"+edit_IdRadio.getText().toString()+"_IMG_"+ timeStamp + ".jpg");
         } else if(type == MEDIA_TYPE_VIDEO) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "Radiobase_"+edit_IdRadio.getText().toString()+"VID_"+ timeStamp + ".mp4");
+                    "Radiobase_"+edit_IdRadio.getText().toString()+"_VID_"+ timeStamp + ".mp4");
         } else {
             return null;
         }
@@ -921,9 +876,7 @@ public class MainActivity extends AppCompatActivity {
         return mediaFile;
     }
 
-
     //////////////////////////--- FOTO Y VIDEO ----//////////////////////
-
 
     private void BotonesEnabled (boolean ena){
 
@@ -945,9 +898,10 @@ public class MainActivity extends AppCompatActivity {
         edit_Port.setText(mispreferencias.getString("edit_Port", "9001"));
         edit_PortKA.setText(mispreferencias.getString("edit_PortKA", "9002"));
         edit_TimerKA.setText(mispreferencias.getString("edit_TimerKA", "10"));
-       edit_DuracionVideo.setText(String.valueOf(mispreferencias.getInt("edit_DuracionVideo", 12)));
+       edit_DuracionVideo.setText(String.valueOf(mispreferencias.getInt("edit_DuracionVideo", 10)));
         toggleAudio.setChecked(mispreferencias.getBoolean("audioBool", true));
         toggle_ka.setChecked(mispreferencias.getBoolean("boolKA", true));
+        switch_muteAlarm.setChecked(mispreferencias.getBoolean("muteAlarm",false));
         Log.d(TAG, "Preferencias Cargadas , boolKA: " + toggle_ka.isChecked());
 
  }
@@ -964,6 +918,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt("edit_DuracionVideo", Integer.parseInt(edit_DuracionVideo.getText().toString()));
         editor.putBoolean("audioBool", toggleAudio.isChecked());
         editor.putBoolean("boolKA", toggle_ka.isChecked());
+        editor.putBoolean("muteAlarm", switch_muteAlarm.isChecked());
         editor.commit();
         Log.d(TAG, "Preferencias Guardadas , boolKA: " + mispreferencias.getBoolean("boolKA", true));
 
@@ -993,7 +948,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if (id == R.id.about) {
 
-           Toast.makeText(getApplicationContext(), "Aplicacion desarrollada por\nIng. Diego A.Giovanazzi.\n" +
+           Toast.makeText(getApplicationContext(), "Correo del desarrollador:\n diegogiovanazzi@gmail.com" +
                    " correo: DiegoGiovanazzi@gmail.com", Toast.LENGTH_LONG).show();
             return true;
         }
@@ -1008,13 +963,9 @@ public class MainActivity extends AppCompatActivity {
         String userName="idirect";
         String pass="IDIRECT";
 
-            cliente = new ConnectUploadAsync(getApplicationContext(),ip,userName,pass,MainActivity.this);
-            cliente.execute();
-
-
-
-    }
-
+        cliente = new ConnectUploadAsync(getApplicationContext(),ip,userName,pass,MainActivity.this);
+        cliente.execute();
+   }
 
     public class ThFilmacion implements Runnable{
 
@@ -1022,6 +973,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
 
             if (prepareVideoRecorder()) {
+              //  MuteAlarm=true;
                 // Camera is available and unlocked, MediaRecorder is prepared,
                 // now you can start recording
 
@@ -1059,7 +1011,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                  Log.d(TAG,"filmacion detenida y en proceso de envio");
-
+                // MuteAlarm=false;
             }
 
             EnviarFTP();
@@ -1122,49 +1074,121 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
     //The BroadcastReceiver that listens for bluetooth broadcasts
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                //Device found
-
-                Toast.makeText(getApplicationContext(),"Device found",Toast.LENGTH_SHORT).show();
-            }
-            else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+          if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
                 //Device is now connected
                 Toast.makeText(getApplicationContext(),"Device is now connected",Toast.LENGTH_SHORT).show();
-
-                EnviarSMS sms=new EnviarSMS(context,"2235776581","Bluetooth Conectado");
-                sms.sendSMS();
-
+              ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," 1 13");
+              ClienteTCP.start();
+                 EnviarSMS sms=new EnviarSMS(context,Diego,"Bluetooth Conectado");
+                 sms.sendSMS();
             }
-
-
             else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
                 //Device has disconnected
                 Toast.makeText(getApplicationContext(),"Device has disconnected",Toast.LENGTH_SHORT).show();
                 new  conetarBluetooth().run();
+
                 ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," 1 5");
                 ClienteTCP.start();
-                EnviarSMS sms=new EnviarSMS(context,"2235776581","Bluetooth Desconectado");
+                EnviarSMS sms=new EnviarSMS(context,Diego,"Bluetooth Desconectado");
                 sms.sendSMS();
-
-
             }
         }
     };
 
 
+    private void BroadcastSMS() {
+
+        SmsRecibido=new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                //           Toast.makeText(context,"BroadcasrReceiver",Toast.LENGTH_SHORT).show();
+                final Bundle bundle = intent.getExtras();
+
+                try {
+                    if(bundle != null){
+
+                        final Object[] pdusObj = (Object[]) bundle.get("pdus");
+
+                        for(int i = 0; i < pdusObj.length; i++){
+                            SmsMessage currentMessage = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
+                            String phoneNumber = currentMessage.getDisplayOriginatingAddress();
+                            String senderNum = phoneNumber;
+                            String message = currentMessage.getDisplayMessageBody();
+                            int Comando = 0;
+                            try{
+                                Comando=Integer.parseInt(message);
+
+                            }catch (Exception e){
+
+                                Toast.makeText(context,"Mensaje mal escrito", Toast.LENGTH_SHORT).show();
+                            }
+
+                            switch (Comando){
+
+                                case 1:
+
+                                    sms=new EnviarSMS(context,Diego,"Solicitud de Video:ok");
+                                    sms.sendSMS();
+                                    alarmas=new CheckAlarmas(IdRadiobase, "12",IpPublica, 9001, getApplicationContext(),audioBool);
+                                    alarmas.run();
+                                    new ThFilmacion().run();
+                                    break;
+                                case 2:
+                                    sms=new EnviarSMS(context,Diego,"Solicitud de Conexión bluetooth:ok");
+                                    sms.sendSMS();
+                                    new conetarBluetooth().run();
+
+                                    break;
+                                case 7:
+                                    switch_muteAlarm.setChecked(false);
+                                    sms=new EnviarSMS(context,Diego,"Sensores Activados");
+                                    sms.sendSMS();
+                                    break;
+
+                                case 8:
+                                     switch_muteAlarm.setChecked(true);
+                                    sms=new EnviarSMS(context,Diego,"Sensores Desactivados");
+                                    sms.sendSMS();
+
+                                    GuardarPreferencias();
+                                    break;
+
+                                case 12:
+                                    EnviarFTP();
+                                    alarmas=new CheckAlarmas(IdRadiobase, "12",IpPublica, 9001, getApplicationContext(),audioBool);
+                                    alarmas.run();
+                                    sms=new EnviarSMS(context,Diego,"Solicitud de envio de Archivos");
+                                    sms.sendSMS();
+
+                                    break;
+                                default:
+                                    sms=new EnviarSMS(context,Diego,"Comando Inexistente");
+                                    sms.sendSMS();
+                                    break;
+
+                            }
+
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e("SmsReceiver", "Exception smsReceiver" + e);
+                }
+
+            }
+        };
+
+        registerReceiver(SmsRecibido, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
+        CargarPreferencias();
+    }
+
+
 
 
 }
-
-
-
-
-

@@ -10,7 +10,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.diego.camara.Funciones.ConexionIP;
-import com.example.diego.camara.Funciones.EnviarSMS;
 
 
 /**
@@ -44,8 +43,8 @@ public class SmsRecibido extends BroadcastReceiver {
                 String textoMensaje = mensajes[i].getMessageBody();
 
                 Toast.makeText(context,"SMS:"+textoMensaje,Toast.LENGTH_SHORT).show();
-               EnviarSMS sms=new EnviarSMS(context,idMensaje,"Mensaje: "+textoMensaje);
-                sms.sendSMS();
+             //  EnviarSMS sms=new EnviarSMS(context,idMensaje,"Comando ok : "+textoMensaje);
+             //   sms.sendSMS();
 
                 Log.d("Camara", "Remitente: " + idMensaje);
                 Log.d("Camara", "Mensaje: " + textoMensaje);

@@ -63,6 +63,37 @@ public class CheckAlarmas implements Runnable {
                ClienteTCP.start();
                Log.d(TAG, "Audio Sistema Energizado");
                break;
+           case "7":
+               Audio =new Multimedia(contex,7);
+               if(audioBool){Audio.AudioPlay();}
+               msg=Mensaje(IdRadiobase,14);
+               ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
+               ClienteTCP.start();
+            //   Log.d(TAG, "Audio Sistema Energizado");
+               break;
+           case "8":
+               Audio =new Multimedia(contex,8);
+               if(audioBool){Audio.AudioPlay();}
+               msg=Mensaje(IdRadiobase,15);
+               ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
+               ClienteTCP.start();
+               Log.d(TAG, "Audio Sistema Energizado");
+               break;
+           case "12":
+
+               msg=Mensaje(IdRadiobase,12);
+               ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
+               ClienteTCP.start();
+               Log.d(TAG, "Audio Sistema Energizado");
+               break;
+           case "17":
+
+               msg=Mensaje(IdRadiobase,17);
+               ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
+               ClienteTCP.start();
+               Log.d(TAG, "Aplicacion Cerrada");
+               break;
+
            default:
 
                Log.d(TAG, "Alarma Default");

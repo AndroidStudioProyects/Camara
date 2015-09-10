@@ -18,7 +18,7 @@ public class Booteo extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         try {
-            Thread.sleep(30000);
+            Thread.sleep(15000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
