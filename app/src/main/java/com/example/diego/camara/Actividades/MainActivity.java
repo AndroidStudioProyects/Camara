@@ -174,7 +174,9 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        new Thread(new conetarBluetooth()).start();
+
+        new conetarBluetooth().run();
+
     }
 
     @Override
@@ -183,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
        new conetarBluetooth().run();
         Log.d(TAG, "OnResume ");
         CargarPreferencias();
-
+        mCamera.startPreview();
     }
 
     @Override
@@ -1076,18 +1078,46 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             switch (Comando){
+                                case 0:
+
+                                //    sms=new EnviarSMS(context,phoneNumber,"Kill aplication");
+
+                                 //   sms.sendSMS();
+                              //      finish();
+                                    //
+                                   // moveTaskToBack(true);
+                                  //  moveTaskToBack(true);
+                                  //  moveTaskToBack(true);
+                            //        android.os.Process.killProcess(android.os.Process.myPid());
+                                    Intent intentoStop = new Intent(context,MainActivity.class);
+
+                                    intentoStop.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    intentoStop.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                    startActivity(intentoStop);
+                                    finish();
+                                    System.exit(0);
+                                    android.os.Process.killProcess(android.os.Process.myPid());
+
+
 
                                 case 1:
-                                    sms=new EnviarSMS(context,phoneNumber,"Solicitud de Video:ok");
-                                    sms.sendSMS();
+
                                     alarmas=new CheckAlarmas(IdRadiobase, "12",IpPublica, 9001, getApplicationContext(),audioBool);
                                     alarmas.run();
                                     Filmacion();
+                                    sms=new EnviarSMS(context,phoneNumber,"Solicitud de Video:ok");
+                                    sms.sendSMS();
                                     break;
                                 case 2:
                                     new conetarBluetooth().run();
                                     sms=new EnviarSMS(context,phoneNumber,"Solicitud de Conexión bluetooth:ok");
                                     sms.sendSMS();
+                                    break;
+                                case 3:
+
+                                    sms=new EnviarSMS(context,phoneNumber,"Kill Aplication:ok");
+                                    sms.sendSMS();
+                                    finish();
                                     break;
                                 case 7:
                                     switch_muteAlarm.setChecked(false);
@@ -1110,10 +1140,7 @@ public class MainActivity extends AppCompatActivity {
                                     sms.sendSMS();
 
                                     break;
-                                default:
-                                    sms=new EnviarSMS(context,phoneNumber,"Comando Inexistente");
-                                    sms.sendSMS();
-                                    break;
+
 
                             }
 

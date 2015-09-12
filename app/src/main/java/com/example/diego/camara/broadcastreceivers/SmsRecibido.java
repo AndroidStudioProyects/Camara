@@ -9,15 +9,17 @@ import android.telephony.SmsMessage;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.diego.camara.Actividades.MainActivity;
 import com.example.diego.camara.Funciones.ConexionIP;
+import com.example.diego.camara.Funciones.EnviarSMS;
 
 
 /**
  * Created by Diego on 14/05/2015.
  */
 public class SmsRecibido extends BroadcastReceiver {
-   // Context contexto;
-
+   Context contexto;
+   EnviarSMS sms;
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -29,29 +31,56 @@ public class SmsRecibido extends BroadcastReceiver {
         ConexionIP ClienteTCP=new ConexionIP(IP,Puerto," 1 9");
         ClienteTCP.start();
 
-        Bundle b = intent.getExtras();
+        final Bundle bundle = intent.getExtras();
 
-        if (b != null) {
-            Object[] pdus = (Object[]) b.get("pdus");
+        try {
+            if(bundle != null){
 
-            SmsMessage[] mensajes = new SmsMessage[pdus.length];
+                final Object[] pdusObj = (Object[]) bundle.get("pdus");
 
-            for (int i = 0; i < mensajes.length; i++) {
-                mensajes[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
+                for(int i = 0; i < pdusObj.length; i++){
+                    SmsMessage currentMessage = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
+                    String phoneNumber = currentMessage.getDisplayOriginatingAddress();
+                    String senderNum = phoneNumber;
+                    String message = currentMessage.getDisplayMessageBody();
+                    int Comando = 0;
+                    try{
+                        Comando=Integer.parseInt(message);
 
-                String idMensaje = mensajes[i].getOriginatingAddress();
-                String textoMensaje = mensajes[i].getMessageBody();
+                    }catch (Exception e){
 
-                Toast.makeText(context,"SMS:"+textoMensaje,Toast.LENGTH_SHORT).show();
-             //  EnviarSMS sms=new EnviarSMS(context,idMensaje,"Comando ok : "+textoMensaje);
-             //   sms.sendSMS();
+                        Toast.makeText(context,"Mensaje mal escrito", Toast.LENGTH_SHORT).show();
+                    }
 
-                Log.d("Camara", "Remitente: " + idMensaje);
-                Log.d("Camara", "Mensaje: " + textoMensaje);
+                    switch (Comando){
+
+                        case 20:
+                            sms=new EnviarSMS(context,phoneNumber,"Solicitud de inicio de aplicacion:ok");
+                            sms.sendSMS();
+                            Intent intentoStart= new Intent(context,MainActivity.class);
+                            intentoStart.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intentoStart.addFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+                            context.startActivity(intentoStart);
+                            break;
+                        case 21:
+                            sms=new EnviarSMS(context,phoneNumber,"Solicitud de Cierre de Aplicacion:ok");
+                            sms.sendSMS();
+                            Intent intentoStop = new Intent(context,MainActivity.class);
+                            intentoStop.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intentoStop.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            context.startActivity(intentoStop);
+                                      // System.exit(0);
+                            break;
+                    }
+
+                }
             }
+        } catch (Exception e) {
+            Log.e("SmsReceiver", "Exception smsReceiver" + e);
+        }
         }
 
     }
 
 
-}
+
