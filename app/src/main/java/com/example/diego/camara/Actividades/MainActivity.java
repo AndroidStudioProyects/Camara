@@ -141,11 +141,7 @@ public class MainActivity extends AppCompatActivity {
         this.registerReceiver(mReceiver, filter2);
         this.registerReceiver(mReceiver, filter3);
 
-
         BroadcastSMS();
-
-
-
 
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
@@ -167,7 +163,9 @@ public class MainActivity extends AppCompatActivity {
                             if(!MuteAlarm){
                             alarmas=new CheckAlarmas(IdRadiobase, "2",IpPublica, 9001, getApplicationContext(),audioBool);
                             alarmas.run();
-                            new ThFilmacion().run();}
+                            Filmacion();
+
+                            }
 
                         }
                      //   Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
@@ -176,54 +174,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
-
-
-        // Two things are needed to make a connection:
-        //   A MAC address, which we got above.
-        //   A Service ID or UUID.  In this case we are using the
-        //     UUID for SPP.
-
-        try {
-            btSocket = createBluetoothSocket(device);
-        } catch (IOException e1) {
-            errorExit("Fatal Error", "In onResume() and socket create failed: " + e1.getMessage() + ".");
-        }
-
-        // Discovery is resource intensive.  Make sure it isn't going on
-        // when you attempt to connect and pass your message.
-        btAdapter.cancelDiscovery();
-
-
-        // Establish the connection.  This will block until it connects.
-        Log.d(TAG, "...Connecting...");
-        try {
-            btSocket.connect();
-
-
-            Toast.makeText(getApplicationContext(),"se conectoooo",Toast.LENGTH_SHORT).show();
-
-            Log.d(TAG, "...Connection ok...");
-        } catch (IOException e) {
-            try {
-                btSocket.close();
-            } catch (IOException e2) {
-                errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
-            }
-        }
-
-        // Create a data stream so we can talk to server.
-        Log.d(TAG, "...Create Socket...");
-
-        try {
-            outStream = btSocket.getOutputStream();
-        } catch (IOException e) {
-            errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
-        }
-        mConnectedThread = new ConnectedThread(btSocket);
-        mConnectedThread.start();
-        Log.d(TAG, "OnCreate fin");
-
+        new Thread(new conetarBluetooth()).start();
     }
 
     @Override
@@ -232,7 +183,6 @@ public class MainActivity extends AppCompatActivity {
        new conetarBluetooth().run();
         Log.d(TAG, "OnResume ");
         CargarPreferencias();
-//// bluettohhh
 
     }
 
@@ -241,12 +191,13 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         Log.d(TAG, "OnStop");
         GuardarPreferencias();
-    //    mCamera.startPreview();
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(SmsRecibido);
         ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," 1 17");
         ClienteTCP.start();
         Log.d(TAG, "OnDestroy");
@@ -422,6 +373,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+               // new conetarBluetooth().run();
                 new conetarBluetooth().run();
 
             }
@@ -441,8 +393,8 @@ public class MainActivity extends AppCompatActivity {
         btn_Video.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-            //   Filmacion();
-            new ThFilmacion().run();
+               Filmacion();
+
                 Log.d(TAG, "Boton de Video");
             }
         });
@@ -452,8 +404,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
-                    Toast.makeText(getApplicationContext(),"Conexion?="+ btSocket.isConnected(),Toast.LENGTH_LONG).show();
+              Toast.makeText(getApplicationContext(),"Conexion?="+ btSocket.isConnected(),Toast.LENGTH_LONG).show();
 
 
             }
@@ -476,8 +427,6 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d(TAG, "Alarma de Apertura");
                 textIn.setText("3");
-
-
 
             }
         });
@@ -577,7 +526,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+/*
     public void Filmacion() {
         if (isRecording) {
             // stop recording and release camera
@@ -613,7 +562,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
+*/
     private void LevantarXML() {
 
         textAlarma1 = (TextView) findViewById(R.id.textAlarma1);
@@ -967,10 +916,9 @@ public class MainActivity extends AppCompatActivity {
         cliente.execute();
    }
 
-    public class ThFilmacion implements Runnable{
+    public void Filmacion(){
 
 
-        public void run() {
 
             if (prepareVideoRecorder()) {
               //  MuteAlarm=true;
@@ -1016,9 +964,6 @@ public class MainActivity extends AppCompatActivity {
 
             EnviarFTP();
 
-
-
-        }
     }
 
     public class conetarBluetooth implements Runnable{
@@ -1133,43 +1078,40 @@ public class MainActivity extends AppCompatActivity {
                             switch (Comando){
 
                                 case 1:
-
-                                    sms=new EnviarSMS(context,Diego,"Solicitud de Video:ok");
+                                    sms=new EnviarSMS(context,phoneNumber,"Solicitud de Video:ok");
                                     sms.sendSMS();
                                     alarmas=new CheckAlarmas(IdRadiobase, "12",IpPublica, 9001, getApplicationContext(),audioBool);
                                     alarmas.run();
-                                    new ThFilmacion().run();
+                                    Filmacion();
                                     break;
                                 case 2:
-                                    sms=new EnviarSMS(context,Diego,"Solicitud de Conexión bluetooth:ok");
-                                    sms.sendSMS();
                                     new conetarBluetooth().run();
-
+                                    sms=new EnviarSMS(context,phoneNumber,"Solicitud de Conexión bluetooth:ok");
+                                    sms.sendSMS();
                                     break;
                                 case 7:
                                     switch_muteAlarm.setChecked(false);
-                                    sms=new EnviarSMS(context,Diego,"Sensores Activados");
+                                    sms=new EnviarSMS(context,phoneNumber,"Sensores Activados");
                                     sms.sendSMS();
                                     break;
 
                                 case 8:
                                      switch_muteAlarm.setChecked(true);
-                                    sms=new EnviarSMS(context,Diego,"Sensores Desactivados");
+                                    sms=new EnviarSMS(context,phoneNumber,"Sensores Desactivados");
                                     sms.sendSMS();
-
                                     GuardarPreferencias();
                                     break;
 
                                 case 12:
                                     EnviarFTP();
-                                    alarmas=new CheckAlarmas(IdRadiobase, "12",IpPublica, 9001, getApplicationContext(),audioBool);
+                                    alarmas=new CheckAlarmas(IdRadiobase, "11",IpPublica, 9001, getApplicationContext(),audioBool);
                                     alarmas.run();
-                                    sms=new EnviarSMS(context,Diego,"Solicitud de envio de Archivos");
+                                    sms=new EnviarSMS(context,phoneNumber,"Solicitud de envio de Archivos");
                                     sms.sendSMS();
 
                                     break;
                                 default:
-                                    sms=new EnviarSMS(context,Diego,"Comando Inexistente");
+                                    sms=new EnviarSMS(context,phoneNumber,"Comando Inexistente");
                                     sms.sendSMS();
                                     break;
 
