@@ -12,6 +12,7 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -43,6 +44,7 @@ import com.example.diego.camara.Funciones.CheckAlarmas;
 import com.example.diego.camara.Funciones.ConexionIP;
 import com.example.diego.camara.Funciones.EnviarSMS;
 import com.example.diego.camara.R;
+import com.example.diego.camara.Root.Shell;
 import com.example.diego.camara.Services.KeepAlive;
 
 import java.io.File;
@@ -86,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
     static EditText textOut,edit_IP,edit_Port,edit_IdRadio,textIn,edit_TimerKA,edit_PortKA,edit_DuracionVideo;
     Button buttonSend, btn_Prueba, btn_Foto, btn_Video, btn_Intrusion,btn_USB;
     Button btn_Energia,btn_Apertura,btn_Conf_FTP,btn_Enviar_FTP;
+    Button btn_Reboot;
     public TextView textAlarma1,text_Bytes;
     public ProgressBar progressBar;
 
@@ -319,6 +322,15 @@ public class MainActivity extends AppCompatActivity {
 
     ///////////////7//   //////////////////
     private void Botones() {
+
+        btn_Reboot.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                (new StartUp()).setContext(v.getContext()).execute("reboot");
+
+
+            }
+        });
 
         switch_muteAlarm.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
@@ -584,6 +596,7 @@ public class MainActivity extends AppCompatActivity {
         toggle_ka= (ToggleButton) findViewById(R.id.toggle_ka);
         toggleAudio= (ToggleButton) findViewById(R.id.toggleAudio);
 
+        btn_Reboot=(Button)findViewById(R.id.btn_Reboot);
         buttonSend = (Button) findViewById(R.id.send);
         btn_Foto = (Button) findViewById(R.id.btn_Captura);
         btn_Video = (Button) findViewById(R.id.btn_Video);
@@ -1140,7 +1153,10 @@ public class MainActivity extends AppCompatActivity {
                                     sms.sendSMS();
 
                                     break;
+                                case 13:
+                                    (new StartUp()).setContext(getApplicationContext()).execute("reboot");
 
+                                    break;
 
                             }
 
@@ -1157,7 +1173,42 @@ public class MainActivity extends AppCompatActivity {
         CargarPreferencias();
     }
 
+    private class StartUp extends AsyncTask<String,Void,Void> {
 
+
+        private Context context = null;
+        boolean suAvailable = false;
+        //Created by themakeinfo.com,Promote us !!!
+        public StartUp setContext(Context context) {
+            this.context = context;
+            return this;
+        }
+
+
+        protected Void doInBackground(String... params) {
+            suAvailable = Shell.SU.available();
+            if (suAvailable) {
+
+                // suResult = Shell.SU.run(new String[] {"cd data; ls"}); Shell.SU.run("reboot");
+                switch (params[0]){
+                    case "reboot"  : Shell.SU.run("reboot");break;
+                    case "recov"   : Shell.SU.run("reboot recovery");break;
+                    case "shutdown": Shell.SU.run("reboot -p");break;
+                    //case "sysui"   : Shell.SU.run("am startservice -n com.android.systemui/.SystemUIService");break;
+                    case "sysui"   : Shell.SU.run("pkill com.android.systemui");break;
+                }
+            }
+            else{
+                Toast.makeText(getApplicationContext(),"Phone not Rooted",Toast.LENGTH_SHORT).show();
+            }
+
+            return null;
+        }
+
+
+
+
+    }
 
 
 }
