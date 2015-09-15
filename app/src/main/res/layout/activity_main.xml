@@ -37,7 +37,7 @@
                     android:inputType="number"
                     android:ems="10"
                     android:id="@+id/edit_IdRadio"
-                    android:text="1"
+                    android:text="6"
                     android:focusable="true" />
 
                 <TextView
@@ -80,6 +80,13 @@
                     android:id="@+id/edit_IP"
                     android:text="idirect.dlinkddns.com"
                     android:focusable="true" />
+
+                <ToggleButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Led"
+                    android:id="@+id/tb_Led"
+                    android:checked="false" />
 
             </LinearLayout>
 
@@ -129,7 +136,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/edit_DuracionVideo"
-                        android:text="10" />
+                        android:text="5" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -170,7 +177,7 @@
                     android:inputType="number"
                     android:ems="10"
                     android:id="@+id/edit_TimerKA"
-                    android:text="15" />
+                    android:text="8" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -203,7 +210,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/textin"
-                    android:layout_weight="0.37" />
+                    android:layout_weight="0.37"
+                    android:enabled="false"
+                    android:focusable="true" />
 
                 <TextView
                     android:layout_width="wrap_content"

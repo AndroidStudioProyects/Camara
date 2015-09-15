@@ -7,12 +7,13 @@ import android.content.SharedPreferences;
 
 import com.example.diego.camara.Actividades.MainActivity;
 import com.example.diego.camara.Funciones.ConexionIP;
+import com.example.diego.camara.Funciones.EnviarSMS;
 
 /**
  * Created by Diego on 30/04/2015.
  */
 public class Booteo extends BroadcastReceiver {
-
+EnviarSMS sms;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -25,7 +26,12 @@ public class Booteo extends BroadcastReceiver {
 
         Intent intento= new Intent(context,MainActivity.class);
         intento.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intento.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
         context.startActivity(intento);
+
+        sms=new EnviarSMS(context,"2235776581","Telefono Reiniciado");
+        sms.sendSMS();
 
         SharedPreferences mispreferencias=context.getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
         String IP=mispreferencias.getString("edit_IP", "idirect.dlinkddns.com");

@@ -12,7 +12,6 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -44,7 +43,6 @@ import com.example.diego.camara.Funciones.CheckAlarmas;
 import com.example.diego.camara.Funciones.ConexionIP;
 import com.example.diego.camara.Funciones.EnviarSMS;
 import com.example.diego.camara.R;
-import com.example.diego.camara.Root.Shell;
 import com.example.diego.camara.Services.KeepAlive;
 
 import java.io.File;
@@ -61,12 +59,13 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-// sms
+    // sms
     EnviarSMS sms;
-            //   BLUETOOTH !
+    //   BLUETOOTH !
 
-    private StringBuilder sb= new StringBuilder();
-    final int RECIEVE_MESSAGE=1;
+
+    private StringBuilder sb = new StringBuilder();
+    final int RECIEVE_MESSAGE = 1;
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
@@ -74,47 +73,52 @@ public class MainActivity extends AppCompatActivity {
     ConnectedThread mConnectedThread;
     // SPP UUID service
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private static boolean BoolFoto=false;
+    private static boolean BoolFoto = false;
     // MAC-address of Bluetooth module (you must edit this line)
     //private static String address = "00:14:01:06:13:29";
 
     //Linvor Bluetooth
     private static String address = "00:12:12:04:41:11";
-    public static String Alarmabluetooth="0";
+    public static String Alarmabluetooth = "0";
     // BLUETOOTH FIN
 
     ToggleButton toggleAudio, toggle_ka;
     Switch switch_muteAlarm;
-    static EditText textOut,edit_IP,edit_Port,edit_IdRadio,textIn,edit_TimerKA,edit_PortKA,edit_DuracionVideo;
-    Button buttonSend, btn_Prueba, btn_Foto, btn_Video, btn_Intrusion,btn_USB;
-    Button btn_Energia,btn_Apertura,btn_Conf_FTP,btn_Enviar_FTP;
+    static EditText textOut, edit_IP, edit_Port, edit_IdRadio, textIn, edit_TimerKA, edit_PortKA, edit_DuracionVideo;
+    Button buttonSend, btn_Prueba, btn_Foto, btn_Video, btn_Intrusion, btn_USB;
+    Button btn_Energia, btn_Apertura, btn_Conf_FTP, btn_Enviar_FTP;
     Button btn_Reboot;
-    public TextView textAlarma1,text_Bytes;
+    public TextView textAlarma1, text_Bytes;
     public ProgressBar progressBar;
 
     String stringToRx;
     private FrameLayout preview;
     private SurfaceView mPreview;
     Boolean isRecording = false;
-    Boolean MuteAlarm=false;
+    Boolean MuteAlarm = false;
     private Camera mCamera;
     private MediaRecorder mMediaRecorder;
     Camera.Parameters parameters;
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
     private int calidadFoto = 90;
-    public static Boolean Bandera=false;
+    public static Boolean Bandera = false;
     static final String TAG = "Camara";
-    boolean audioBool=false;
-     public static int  IdRadiobase=0;
+    boolean audioBool = false;
+    public static int IdRadiobase = 0;
     Intent intentKeepAlive;
     public ConnectUploadAsync cliente;
     String IpPublica;
     CheckAlarmas alarmas;
+    conetarBluetooth objeto_conetarBluetooth=null;
 
-    public static final String Diego="2235776581";
+    public static final String Diego = "2235776581";
 
-    private BroadcastReceiver SmsRecibido ;
+
+
+    ToggleButton tb_Led;
+    private BroadcastReceiver SmsRecibido;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,15 +131,16 @@ public class MainActivity extends AppCompatActivity {
 
 
         IdRadiobase = Integer.parseInt(edit_IdRadio.getText().toString());
-        IpPublica=edit_IP.getText().toString();
-  //      BotonesEnabled(false);
+        IpPublica = edit_IP.getText().toString();
+        //      BotonesEnabled(false);
         CAMARA_ON();
         ////defino bluetooth adapter
-        btAdapter=BluetoothAdapter.getDefaultAdapter();
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
         checkBTState();//Checkeo el estado
 
 /// BroadcastReceiver  Bluettoth
 
+       new conetarBluetooth().run();
         IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
         IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
         IntentFilter filter3 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
@@ -157,35 +162,32 @@ public class MainActivity extends AppCompatActivity {
                         if (endOfLineIndex > 0) {                                            // if end-of-line,
 
                             String sbprint = sb.substring(0, endOfLineIndex);               // extract string
-                            Toast.makeText(getBaseContext(),"Alarma: '"+sbprint+"'",Toast.LENGTH_LONG).show();
-
-                            Alarmabluetooth=sbprint;
+                            Toast.makeText(getBaseContext(), "Alarma: '" + sbprint + "'", Toast.LENGTH_LONG).show();
+                            Alarmabluetooth = sbprint;
                             sb.delete(0, sb.length());                                      // and clear
-                            Log.d(TAG, "Alarma recibida: "+Alarmabluetooth);
+                            Log.d(TAG, "Alarma recibida: " + Alarmabluetooth);
 
-                            if(!MuteAlarm){
-                            alarmas=new CheckAlarmas(IdRadiobase, "2",IpPublica, 9001, getApplicationContext(),audioBool);
-                            alarmas.run();
-                            Filmacion();
-
+                            if (!MuteAlarm) {
+                                alarmas = new CheckAlarmas(IdRadiobase, "2", IpPublica, 9001, getApplicationContext(), audioBool);
+                                alarmas.run();
+                                Filmacion();
                             }
-
                         }
-                     //   Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
                         break;
                 }
             }
         };
 
 
-        new conetarBluetooth().run();
-
+  //      mCamera.startPreview();
     }
+
 
     @Override
     public void onResume() {
         super.onResume();
-       new conetarBluetooth().run();
+        objeto_conetarBluetooth=new conetarBluetooth();
+        objeto_conetarBluetooth.run();
         Log.d(TAG, "OnResume ");
         CargarPreferencias();
         mCamera.startPreview();
@@ -269,6 +271,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void errorExit(String title, String message){
         finish();
+        Toast.makeText(getApplicationContext(),"Errorrr",Toast.LENGTH_SHORT).show();
     }
 
     private class ConnectedThread extends Thread {
@@ -288,6 +291,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
             }
 
+
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
         }
@@ -303,6 +307,8 @@ public class MainActivity extends AppCompatActivity {
                     bytes = mmInStream.read(buffer);        // Get number of bytes and message in "buffer"
                     h.obtainMessage(RECIEVE_MESSAGE, bytes, -1, buffer).sendToTarget();     // Send to message queue Handler
                 } catch (IOException e) {
+
+
                     break;
                 }
             }
@@ -318,19 +324,11 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "...Error data send: " + e.getMessage() + "...");
             }
         }
+
     }
 
     ///////////////7//   //////////////////
     private void Botones() {
-
-        btn_Reboot.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                (new StartUp()).setContext(v.getContext()).execute("reboot");
-
-
-            }
-        });
 
         switch_muteAlarm.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
@@ -338,20 +336,15 @@ public class MainActivity extends AppCompatActivity {
 
                 if (isChecked) {
                     Log.d(TAG, "Sensores Desactivados");
-                    MuteAlarm=true;
-                    alarmas=new CheckAlarmas(IdRadiobase, "8",IpPublica, 9001, getApplicationContext(),audioBool);
+                    MuteAlarm = true;
+                    alarmas = new CheckAlarmas(IdRadiobase, "8", IpPublica, 9001, getApplicationContext(), audioBool);
                     alarmas.run();
-                    sms=new EnviarSMS(getApplicationContext(),Diego,"Sensores Desactivados");
-                    sms.sendSMS();
-
-              } else {
-                    MuteAlarm=false;
+                     } else {
+                    MuteAlarm = false;
                     Log.d(TAG, "Sensores Activados");
-                    alarmas=new CheckAlarmas(IdRadiobase, "7",IpPublica, 9001, getApplicationContext(),audioBool);
+                    alarmas = new CheckAlarmas(IdRadiobase, "7", IpPublica, 9001, getApplicationContext(), audioBool);
                     alarmas.run();
-                    sms=new EnviarSMS(getApplicationContext(),Diego,"Sensores Activados");
-                    sms.sendSMS();
-                    }
+                 }
                 GuardarPreferencias();
             }
         });
@@ -359,15 +352,15 @@ public class MainActivity extends AppCompatActivity {
 
         btn_Enviar_FTP.setOnClickListener(new OnClickListener() {
 
-            String ip=edit_IP.getText().toString();
-            String userName="idirect";
-            String pass="IDIRECT";
+            String ip = edit_IP.getText().toString();
+            String userName = "idirect";
+            String pass = "IDIRECT";
 
             @Override
             public void onClick(View v) {
 
-        cliente = new ConnectUploadAsync(getApplicationContext(),ip,userName,pass, MainActivity.this);
-               cliente.execute();
+                cliente = new ConnectUploadAsync(getApplicationContext(), ip, userName, pass, MainActivity.this);
+                cliente.execute();
 
             }
         });
@@ -387,17 +380,66 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-               // new conetarBluetooth().run();
-                new conetarBluetooth().run();
 
+
+                BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
+
+                // Two things are needed to make a connection:
+                //   A MAC address, which we got above.
+                //   A Service ID or UUID.  In this case we are using the
+                //     UUID for SPP.
+
+                try {
+                    btSocket = createBluetoothSocket(device);
+                } catch (IOException e1) {
+                    errorExit("Fatal Error", "In onResume() and socket create failed: " + e1.getMessage() + ".");
+                }
+
+                // Discovery is resource intensive.  Make sure it isn't going on
+                // when you attempt to connect and pass your message.
+                btAdapter.cancelDiscovery();
+
+
+                // Establish the connection.  This will block until it connects.
+                Log.d(TAG, "...Connecting...");
+                try {
+                    btSocket.connect();
+
+
+                    Toast.makeText(getApplicationContext(),"se conectoooo",Toast.LENGTH_SHORT).show();
+
+                    Log.d(TAG, "...Connection ok...");
+                } catch (IOException e) {
+                    try {
+                        btSocket.close();
+                    } catch (IOException e2) {
+                        errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
+                    }
+                }
+
+                // Create a data stream so we can talk to server.
+                Log.d(TAG, "...Create Socket...");
+
+                try {
+                    outStream = btSocket.getOutputStream();
+                } catch (IOException e) {
+                    errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
+                }
+                mConnectedThread = new ConnectedThread(btSocket);
+                mConnectedThread.start();
             }
+
+
+
+
+
         });
 
         btn_Foto.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                             Log.d(TAG, "Boton de Foto");
-            mCamera.takePicture(null,null,mPicture);
+            mCamera.takePicture(null, null, mPicture);
 
             }
 
@@ -469,6 +511,22 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        tb_Led.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    Log.d(TAG, "Led ON");
+                    Toast.makeText(getApplicationContext(), "Led ON", Toast.LENGTH_SHORT).show();
+                    mConnectedThread.write("1\n");
+                }else{
+                    Toast.makeText(getApplicationContext(), "Led OFF", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Led Off");
+                    mConnectedThread.write("0\n");
+                }
+            }
+        });
+
         toggleAudio.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 
@@ -540,43 +598,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-/*
-    public void Filmacion() {
-        if (isRecording) {
-            // stop recording and release camera
-            mMediaRecorder.stop();  // stop the recording
-            releaseMediaRecorder(); // release the MediaRecorder object
-            mCamera.lock();         // take camera access back from MediaRecorder
 
-            EnviarFTP();
-            // inform the user that recording has stopped
-            btn_Video.setText("Rec");
-            isRecording = false;
-            Log.d(TAG, "Filmacion Detenida");
-
-        } else {
-            if (prepareVideoRecorder()) {
-                // Camera is available and unlocked, MediaRecorder is prepared,
-                // now you can start recording
-
-                mMediaRecorder.start();
-                Log.d(TAG, "Filmacion Comenzada");
-
-                // inform the user that recording has started
-                btn_Video.setText("Stop");
-                isRecording = true;
-            } else {
-                // prepare didn't work, release the camera
-                releaseMediaRecorder();
-                Log.d(TAG, "Se libero el MadiaRecorder");
-
-                // inform user
-            }
-        }
-
-
-    }
-*/
     private void LevantarXML() {
 
         textAlarma1 = (TextView) findViewById(R.id.textAlarma1);
@@ -595,7 +617,7 @@ public class MainActivity extends AppCompatActivity {
 
         toggle_ka= (ToggleButton) findViewById(R.id.toggle_ka);
         toggleAudio= (ToggleButton) findViewById(R.id.toggleAudio);
-
+        tb_Led= (ToggleButton) findViewById(R.id.tb_Led);
         btn_Reboot=(Button)findViewById(R.id.btn_Reboot);
         buttonSend = (Button) findViewById(R.id.send);
         btn_Foto = (Button) findViewById(R.id.btn_Captura);
@@ -981,10 +1003,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public class conetarBluetooth implements Runnable{
+    public class conetarBluetooth implements Runnable {
 
         @Override
         public void run() {
+
 
             BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
 
@@ -1034,6 +1057,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     //The BroadcastReceiver that listens for bluetooth broadcasts
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -1051,9 +1075,10 @@ public class MainActivity extends AppCompatActivity {
             else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
                 //Device has disconnected
                 Toast.makeText(getApplicationContext(),"Device has disconnected",Toast.LENGTH_SHORT).show();
-                new  conetarBluetooth().run();
 
-                ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," 1 5");
+              new conetarBluetooth().run();
+
+              ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," 1 5");
                 ClienteTCP.start();
                 EnviarSMS sms=new EnviarSMS(context,Diego,"Bluetooth Desconectado");
                 sms.sendSMS();
@@ -1081,71 +1106,59 @@ public class MainActivity extends AppCompatActivity {
                             String phoneNumber = currentMessage.getDisplayOriginatingAddress();
                             String senderNum = phoneNumber;
                             String message = currentMessage.getDisplayMessageBody();
-                            int Comando = 0;
-                            try{
-                                Comando=Integer.parseInt(message);
-
-                            }catch (Exception e){
-
-                                Toast.makeText(context,"Mensaje mal escrito", Toast.LENGTH_SHORT).show();
-                            }
-
-                            switch (Comando){
-                                case 0:
-
-                                //    sms=new EnviarSMS(context,phoneNumber,"Kill aplication");
-
-                                 //   sms.sendSMS();
-                              //      finish();
-                                    //
-                                   // moveTaskToBack(true);
-                                  //  moveTaskToBack(true);
-                                  //  moveTaskToBack(true);
-                            //        android.os.Process.killProcess(android.os.Process.myPid());
-                                    Intent intentoStop = new Intent(context,MainActivity.class);
-
-                                    intentoStop.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intentoStop.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                                    startActivity(intentoStop);
-                                    finish();
-                                    System.exit(0);
-                                    android.os.Process.killProcess(android.os.Process.myPid());
 
 
-
-                                case 1:
-
+                            switch (message){
+                                case "Video":
+                                    sms=new EnviarSMS(context,phoneNumber,"Solicitud de Video:ok");
+                                    sms.sendSMS();
                                     alarmas=new CheckAlarmas(IdRadiobase, "12",IpPublica, 9001, getApplicationContext(),audioBool);
                                     alarmas.run();
                                     Filmacion();
-                                    sms=new EnviarSMS(context,phoneNumber,"Solicitud de Video:ok");
-                                    sms.sendSMS();
+
                                     break;
-                                case 2:
-                                    new conetarBluetooth().run();
+
+                                case "Blue":
                                     sms=new EnviarSMS(context,phoneNumber,"Solicitud de Conexión bluetooth:ok");
                                     sms.sendSMS();
+                                    new conetarBluetooth().run();
                                     break;
-                                case 3:
 
+                                case "Kill":
                                     sms=new EnviarSMS(context,phoneNumber,"Kill Aplication:ok");
                                     sms.sendSMS();
                                     finish();
+                                    System.exit(0);
                                     break;
-                                case 7:
+
+                                case "Open":  mConnectedThread.write("1\n");
+                                    sms=new EnviarSMS(context,phoneNumber,"Puerta abierta");
+                                    sms.sendSMS();break;
+
+                                case "Close":  mConnectedThread.write("0\n");
+                                    sms=new EnviarSMS(context,phoneNumber,"Puerta cerrada");
+                                    sms.sendSMS();break;
+
+                                case "Api":
+                                    System.exit(0);
+                                    Intent intento=getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
+                                    intento.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(intento);
+                                    break;
+                                case "On":
                                     switch_muteAlarm.setChecked(false);
                                     sms=new EnviarSMS(context,phoneNumber,"Sensores Activados");
                                     sms.sendSMS();
                                     break;
 
-                                case 8:
+                                case "Off":
                                      switch_muteAlarm.setChecked(true);
                                     sms=new EnviarSMS(context,phoneNumber,"Sensores Desactivados");
                                     sms.sendSMS();
                                     GuardarPreferencias();
                                     break;
 
-                                case 12:
+                                case "Ftp":
                                     EnviarFTP();
                                     alarmas=new CheckAlarmas(IdRadiobase, "11",IpPublica, 9001, getApplicationContext(),audioBool);
                                     alarmas.run();
@@ -1153,10 +1166,8 @@ public class MainActivity extends AppCompatActivity {
                                     sms.sendSMS();
 
                                     break;
-                                case 13:
-                                    (new StartUp()).setContext(getApplicationContext()).execute("reboot");
 
-                                    break;
+                               default:break;
 
                             }
 
@@ -1165,45 +1176,12 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     Log.e("SmsReceiver", "Exception smsReceiver" + e);
                 }
-
             }
         };
-
         registerReceiver(SmsRecibido, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
-        CargarPreferencias();
+
     }
 
-    private class StartUp extends AsyncTask<String,Void,Void> {
-
-
-        private Context context = null;
-        boolean suAvailable = false;
-        //Created by themakeinfo.com,Promote us !!!
-        public StartUp setContext(Context context) {
-            this.context = context;
-            return this;
-        }
-
-
-        protected Void doInBackground(String... params) {
-            suAvailable = Shell.SU.available();
-            if (suAvailable) {
-
-                // suResult = Shell.SU.run(new String[] {"cd data; ls"}); Shell.SU.run("reboot");
-                switch (params[0]){
-                    case "reboot"  : Shell.SU.run("reboot");break;
-                    case "recov"   : Shell.SU.run("reboot recovery");break;
-                    case "shutdown": Shell.SU.run("reboot -p");break;
-                    //case "sysui"   : Shell.SU.run("am startservice -n com.android.systemui/.SystemUIService");break;
-                    case "sysui"   : Shell.SU.run("pkill com.android.systemui");break;
-                }
-            }
-            else{
-                Toast.makeText(getApplicationContext(),"Phone not Rooted",Toast.LENGTH_SHORT).show();
-            }
-
-            return null;
-        }
 
 
 
@@ -1211,4 +1189,4 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-}
+
