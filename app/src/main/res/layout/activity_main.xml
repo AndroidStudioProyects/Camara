@@ -269,8 +269,8 @@
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_width="wrap_content"
+                android:layout_height="100dp">
 
                 <Button
                     android:layout_width="wrap_content"
@@ -357,6 +357,12 @@
                 android:id="@+id/progressBar"
                 android:indeterminate="false"
                 android:max="100" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="New Text"
+                android:id="@+id/text_GPS" />
 
         </LinearLayout>
     </ScrollView>

@@ -44,6 +44,7 @@ import com.example.diego.camara.Funciones.ConexionIP;
 import com.example.diego.camara.Funciones.EnviarSMS;
 import com.example.diego.camara.R;
 import com.example.diego.camara.Services.KeepAlive;
+import com.example.diego.camara.Services.ServicioGPS;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -88,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     Button buttonSend, btn_Prueba, btn_Foto, btn_Video, btn_Intrusion, btn_USB;
     Button btn_Energia, btn_Apertura, btn_Conf_FTP, btn_Enviar_FTP;
     Button btn_Reboot;
-    public TextView textAlarma1, text_Bytes;
+    public TextView textAlarma1, text_Bytes,text_GPS;
     public ProgressBar progressBar;
 
     String stringToRx;
@@ -178,7 +179,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-
+        ServicioGPS servicio=new ServicioGPS(getApplicationContext());
+        servicio.setView(text_GPS);
   //      mCamera.startPreview();
     }
 
@@ -605,6 +607,7 @@ public class MainActivity extends AppCompatActivity {
         textOut = (EditText) findViewById(R.id.textout);
         textIn = (EditText) findViewById(R.id.textin);
         text_Bytes=(TextView)findViewById(R.id.text_Bytes);
+        text_GPS=(TextView)findViewById(R.id.text_GPS);
 
         progressBar=(ProgressBar)findViewById(R.id.progressBar);
 
