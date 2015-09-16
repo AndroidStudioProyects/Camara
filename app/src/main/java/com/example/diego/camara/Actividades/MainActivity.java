@@ -60,6 +60,9 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
+    ServicioGPS servicio;
+    public static String LatyLong;
+
     // sms
     EnviarSMS sms;
     //   BLUETOOTH !
@@ -179,9 +182,13 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        ServicioGPS servicio=new ServicioGPS(getApplicationContext());
-        servicio.setView(text_GPS);
+        servicio=new ServicioGPS(getApplicationContext());
+      //  servicio.setView(text_GPS);
+        text_GPS.setText(servicio.LatyLong());
+        LatyLong=servicio.LatyLong();
+
   //      mCamera.startPreview();
+
     }
 
 
@@ -1169,8 +1176,12 @@ public class MainActivity extends AppCompatActivity {
                                     sms.sendSMS();
 
                                     break;
+                                case "Gps":
+                                    sms=new EnviarSMS(context,phoneNumber,"http://maps.google.com/maps?z=15&q="+servicio.LatyLong());
+                                    sms.sendSMS();
+                                    break;
 
-                               default:break;
+                                default:break;
 
                             }
 

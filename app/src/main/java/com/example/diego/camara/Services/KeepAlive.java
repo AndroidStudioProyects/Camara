@@ -37,6 +37,7 @@ public class KeepAlive  extends Service {
         hilito.start();
         Toast.makeText(getApplicationContext(), "Servicio Keep Alive iniciado", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "OnStart Keep Alive Bool: "+Bool);
+
       return START_STICKY;
     }
 

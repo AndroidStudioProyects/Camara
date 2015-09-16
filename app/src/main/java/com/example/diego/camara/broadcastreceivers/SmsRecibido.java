@@ -11,6 +11,7 @@ import android.util.Log;
 import com.example.diego.camara.Funciones.ConexionIP;
 import com.example.diego.camara.Funciones.EnviarSMS;
 import com.example.diego.camara.Root.Root;
+import com.example.diego.camara.Services.ServicioGPS;
 
 
 /**
@@ -20,6 +21,7 @@ public class SmsRecibido extends BroadcastReceiver {
     Context contexto;
     EnviarSMS sms;
     Root BooteoRoot;
+    ServicioGPS servicio;
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -30,6 +32,7 @@ public class SmsRecibido extends BroadcastReceiver {
 
         ConexionIP ClienteTCP = new ConexionIP(IP, Puerto, " 1 9");
         ClienteTCP.start();
+        servicio=new ServicioGPS(contexto);
 
         final Bundle bundle = intent.getExtras();
 
@@ -51,6 +54,8 @@ public class SmsRecibido extends BroadcastReceiver {
                         BooteoRoot =    new Root().setContext(contexto);
                         BooteoRoot.execute("reboot");
                             break;
+
+                    default:break;
                     }
 
                 }
@@ -59,6 +64,7 @@ public class SmsRecibido extends BroadcastReceiver {
             Log.e("SmsReceiver", "Exception smsReceiver" + e);
         }
     }
+
 
 
 

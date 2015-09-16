@@ -19,7 +19,7 @@ EnviarSMS sms;
     public void onReceive(Context context, Intent intent) {
 
         try {
-            Thread.sleep(15000);
+            Thread.sleep(20000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

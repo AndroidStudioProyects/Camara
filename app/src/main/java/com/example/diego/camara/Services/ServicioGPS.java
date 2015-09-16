@@ -4,12 +4,12 @@ package com.example.diego.camara.Services;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.TextView;
 
 /**
@@ -49,11 +49,21 @@ public class ServicioGPS extends Service implements LocationListener {
             location=locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
             latitud=location.getLatitude();
             longitud=location.getLongitude();
+            Log.d("GPS","Esta activo");
+        }else{
+
+            Log.d("GPS","No esta activo");
 
         }
     }
 
+    public String LatyLong(){
+    String geolocation="0,0";
 
+        geolocation=String.valueOf(latitud)+","+String.valueOf(longitud);
+    return geolocation;
+
+    }
 
     public void setView(TextView v){
         texto=v;
