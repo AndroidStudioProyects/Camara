@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
     EnviarSMS sms;
     //   BLUETOOTH !
 
-
     private StringBuilder sb = new StringBuilder();
     final int RECIEVE_MESSAGE = 1;
     private BluetoothAdapter btAdapter = null;
@@ -84,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
     //Linvor Bluetooth
     private static String address = "00:12:12:04:41:11";
     public static String Alarmabluetooth = "0";
+
+    public boolean conexionBlue=false;
+    Thread blue;
+
     // BLUETOOTH FIN
 
     ToggleButton toggleAudio, toggle_ka;
@@ -114,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
     public ConnectUploadAsync cliente;
     String IpPublica;
     CheckAlarmas alarmas;
-    conetarBluetooth objeto_conetarBluetooth=null;
 
     public static final String Diego = "2235776581";
 
@@ -144,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
 
 /// BroadcastReceiver  Bluettoth
 
-       new conetarBluetooth().run();
         IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
         IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
         IntentFilter filter3 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
@@ -189,14 +190,16 @@ public class MainActivity extends AppCompatActivity {
 
   //      mCamera.startPreview();
 
+
+        blue =new Thread(new ThreadBluetooth());
+        blue.start();
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-        objeto_conetarBluetooth=new conetarBluetooth();
-        objeto_conetarBluetooth.run();
+
         Log.d(TAG, "OnResume ");
         CargarPreferencias();
         mCamera.startPreview();
@@ -391,51 +394,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
 
-                BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
+                conexionBlue=false;
+                Toast.makeText(getApplicationContext(),"conexion Bluetooth: "+conexionBlue,Toast.LENGTH_SHORT).show();
 
-                // Two things are needed to make a connection:
-                //   A MAC address, which we got above.
-                //   A Service ID or UUID.  In this case we are using the
-                //     UUID for SPP.
-
-                try {
-                    btSocket = createBluetoothSocket(device);
-                } catch (IOException e1) {
-                    errorExit("Fatal Error", "In onResume() and socket create failed: " + e1.getMessage() + ".");
-                }
-
-                // Discovery is resource intensive.  Make sure it isn't going on
-                // when you attempt to connect and pass your message.
-                btAdapter.cancelDiscovery();
-
-
-                // Establish the connection.  This will block until it connects.
-                Log.d(TAG, "...Connecting...");
-                try {
-                    btSocket.connect();
-
-
-                    Toast.makeText(getApplicationContext(),"se conectoooo",Toast.LENGTH_SHORT).show();
-
-                    Log.d(TAG, "...Connection ok...");
-                } catch (IOException e) {
-                    try {
-                        btSocket.close();
-                    } catch (IOException e2) {
-                        errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
-                    }
-                }
-
-                // Create a data stream so we can talk to server.
-                Log.d(TAG, "...Create Socket...");
-
-                try {
-                    outStream = btSocket.getOutputStream();
-                } catch (IOException e) {
-                    errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
-                }
-                mConnectedThread = new ConnectedThread(btSocket);
-                mConnectedThread.start();
             }
 
 
@@ -527,11 +488,12 @@ public class MainActivity extends AppCompatActivity {
                 if(isChecked){
                     Log.d(TAG, "Led ON");
                     Toast.makeText(getApplicationContext(), "Led ON", Toast.LENGTH_SHORT).show();
-                    mConnectedThread.write("1\n");
+
+                    //mConnectedThread.write("1\n");
                 }else{
                     Toast.makeText(getApplicationContext(), "Led OFF", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "Led Off");
-                    mConnectedThread.write("0\n");
+                    //mConnectedThread.write("0\n");
                 }
             }
         });
@@ -1013,13 +975,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public class conetarBluetooth implements Runnable {
+    public void conectarBluetooth() {
 
-        @Override
-        public void run() {
-
-
-            BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
+        BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
 
             // Two things are needed to make a connection:
             //   A MAC address, which we got above.
@@ -1028,8 +986,10 @@ public class MainActivity extends AppCompatActivity {
 
             try {
                 btSocket = createBluetoothSocket(device);
+                conexionBlue=true;
             } catch (IOException e1) {
                 errorExit("Fatal Error", "In onResume() and socket create failed: " + e1.getMessage() + ".");
+                conexionBlue=false;
             }
 
             // Discovery is resource intensive.  Make sure it isn't going on
@@ -1065,8 +1025,6 @@ public class MainActivity extends AppCompatActivity {
             mConnectedThread = new ConnectedThread(btSocket);
             mConnectedThread.start();
         }
-    }
-
 
     //The BroadcastReceiver that listens for bluetooth broadcasts
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -1081,12 +1039,13 @@ public class MainActivity extends AppCompatActivity {
               ClienteTCP.start();
                  EnviarSMS sms=new EnviarSMS(context,Diego,"Bluetooth Conectado");
                  sms.sendSMS();
+              conexionBlue=true;
             }
             else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
                 //Device has disconnected
                 Toast.makeText(getApplicationContext(),"Device has disconnected",Toast.LENGTH_SHORT).show();
 
-              new conetarBluetooth().run();
+              conexionBlue=false;
 
               ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," 1 5");
                 ClienteTCP.start();
@@ -1131,7 +1090,8 @@ public class MainActivity extends AppCompatActivity {
                                 case "Blue":
                                     sms=new EnviarSMS(context,phoneNumber,"Solicitud de Conexión bluetooth:ok");
                                     sms.sendSMS();
-                                    new conetarBluetooth().run();
+
+                                    conexionBlue=false;
                                     break;
 
                                 case "Kill":
@@ -1197,7 +1157,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public class ThreadBluetooth implements Runnable{
 
+
+        @Override
+        public void run() {
+
+            while(true) {
+
+                while(!conexionBlue) {
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                          conectarBluetooth();
+                        }
+                    });
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+
+        }
+    }
 
 
     }
