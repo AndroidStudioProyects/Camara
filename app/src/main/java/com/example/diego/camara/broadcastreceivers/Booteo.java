@@ -19,7 +19,7 @@ EnviarSMS sms;
     public void onReceive(Context context, Intent intent) {
 
         try {
-            Thread.sleep(20000);
+            Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -30,7 +30,7 @@ EnviarSMS sms;
 
         context.startActivity(intento);
 
-        sms=new EnviarSMS(context,"2235776581","Telefono Reiniciado");
+        sms=new EnviarSMS(context,"2235776581","Reboot & Inicio de aplicacion");
         sms.sendSMS();
 
         SharedPreferences mispreferencias=context.getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);

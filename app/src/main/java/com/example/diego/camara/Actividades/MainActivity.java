@@ -191,8 +191,6 @@ public class MainActivity extends AppCompatActivity {
   //      mCamera.startPreview();
 
 
-        blue =new Thread(new ThreadBluetooth());
-        blue.start();
     }
 
 
@@ -200,6 +198,8 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
+        blue =new Thread(new ThreadBluetooth());
+        blue.start();
         Log.d(TAG, "OnResume ");
         CargarPreferencias();
         mCamera.startPreview();
@@ -1034,18 +1034,20 @@ public class MainActivity extends AppCompatActivity {
 
           if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
                 //Device is now connected
+              conexionBlue=true;
                 Toast.makeText(getApplicationContext(),"Device is now connected",Toast.LENGTH_SHORT).show();
               ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," 1 13");
               ClienteTCP.start();
                  EnviarSMS sms=new EnviarSMS(context,Diego,"Bluetooth Conectado");
                  sms.sendSMS();
-              conexionBlue=true;
+
             }
             else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
                 //Device has disconnected
-                Toast.makeText(getApplicationContext(),"Device has disconnected",Toast.LENGTH_SHORT).show();
 
               conexionBlue=false;
+
+              Toast.makeText(getApplicationContext(),"Device has disconnected",Toast.LENGTH_SHORT).show();
 
               ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," 1 5");
                 ClienteTCP.start();
@@ -1101,11 +1103,13 @@ public class MainActivity extends AppCompatActivity {
                                     System.exit(0);
                                     break;
 
-                                case "Open":  mConnectedThread.write("1\n");
+                                case "Open":
+                                    //mConnectedThread.write("1\n");
                                     sms=new EnviarSMS(context,phoneNumber,"Puerta abierta");
                                     sms.sendSMS();break;
 
-                                case "Close":  mConnectedThread.write("0\n");
+                                case "Close":
+                                    //mConnectedThread.write("0\n");
                                     sms=new EnviarSMS(context,phoneNumber,"Puerta cerrada");
                                     sms.sendSMS();break;
 
@@ -1170,6 +1174,8 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d(TAG,"intento de conexion bluettoh");
+                            Toast.makeText(getApplicationContext(), "intento de conexion bluettoth", Toast.LENGTH_SHORT).show();
                           conectarBluetooth();
                         }
                     });
