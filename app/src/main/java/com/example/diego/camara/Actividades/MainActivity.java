@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
     ServicioGPS servicio;
     public static String LatyLong;
-
+    public static String BLUE_PRUEBA_STATIC;
     // sms
     EnviarSMS sms;
     //   BLUETOOTH !
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     private static String address = "00:12:12:04:41:11";
     public static String Alarmabluetooth = "0";
 
-    public boolean conexionBlue=false;
+    public static boolean CONEXIONBLUE=false;
     Thread blue;
 
     // BLUETOOTH FIN
@@ -188,6 +188,8 @@ public class MainActivity extends AppCompatActivity {
         text_GPS.setText(servicio.LatyLong());
         LatyLong=servicio.LatyLong();
 
+
+
   //      mCamera.startPreview();
 
 
@@ -197,9 +199,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-
-        blue =new Thread(new ThreadBluetooth());
-        blue.start();
+        Thread blueLOcal =new Thread(new ThreadBluetooth());
+        blueLOcal.start();
         Log.d(TAG, "OnResume ");
         CargarPreferencias();
         mCamera.startPreview();
@@ -250,96 +251,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /////////////            Bluettohhh     /////////
 
-    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
-        if(Build.VERSION.SDK_INT >= 10){
-            try {
-                final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", new Class[] { UUID.class });
-                return (BluetoothSocket) m.invoke(device, MY_UUID);
-            } catch (Exception e) {
-                Log.e(TAG, "Could not create Insecure RFComm Connection",e);
-            }
-        }
-        return  device.createRfcommSocketToServiceRecord(MY_UUID);
-    }
-
-    private void checkBTState() {
-        // Check for Bluetooth support and then check to make sure it is turned on
-        // Emulator doesn't support Bluetooth and will return null
-        if(btAdapter==null) {
-            errorExit("Fatal Error", "Bluetooth not support");
-        } else {
-            if (btAdapter.isEnabled()) {
-                Log.d(TAG, "...Bluetooth ON...");
-            } else {
-                //Prompt user to turn on Bluetooth
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBtIntent, 1);
-            }
-        }
-
-    }
-
-    private void errorExit(String title, String message){
-        finish();
-        Toast.makeText(getApplicationContext(),"Errorrr",Toast.LENGTH_SHORT).show();
-    }
-
-    private class ConnectedThread extends Thread {
-
-        private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
-
-        public ConnectedThread(BluetoothSocket socket) {
-            InputStream tmpIn = null;
-            OutputStream tmpOut = null;
-
-            // Get the input and output streams, using temp objects because
-            // member streams are final
-            try {
-                tmpIn = socket.getInputStream();
-                tmpOut = socket.getOutputStream();
-            } catch (IOException e) {
-            }
-
-
-            mmInStream = tmpIn;
-            mmOutStream = tmpOut;
-        }
-
-        public void run() {
-            byte[] buffer = new byte[256];  // buffer store for the stream
-            int bytes; // bytes returned from read()
-
-            // Keep listening to the InputStream until an exception occurs
-            while (true) {
-                try {
-                    // Read from the InputStream
-                    bytes = mmInStream.read(buffer);        // Get number of bytes and message in "buffer"
-                    h.obtainMessage(RECIEVE_MESSAGE, bytes, -1, buffer).sendToTarget();     // Send to message queue Handler
-                } catch (IOException e) {
-
-
-                    break;
-                }
-            }
-        }
-
-        /* Call this from the main activity to send data to the remote device */
-        public void write(String message) {
-            Log.d(TAG, "...Data to send: " + message + "...");
-            byte[] msgBuffer = message.getBytes();
-            try {
-                mmOutStream.write(msgBuffer);
-            } catch (IOException e) {
-                Log.d(TAG, "...Error data send: " + e.getMessage() + "...");
-            }
-        }
-
-    }
-
-    ///////////////7//   //////////////////
     private void Botones() {
 
         switch_muteAlarm.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -394,8 +306,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
 
-                conexionBlue=false;
-                Toast.makeText(getApplicationContext(),"conexion Bluetooth: "+conexionBlue,Toast.LENGTH_SHORT).show();
+                CONEXIONBLUE=false;
+                //Toast.makeText(getApplicationContext(),"conexion Bluetooth: "+conexionBlue,Toast.LENGTH_SHORT).show();
 
             }
 
@@ -847,72 +759,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-///////////////////// PREFERENCIAS DE USUARIO ////////////////
-    public void CargarPreferencias(){
-
-        SharedPreferences mispreferencias=getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
-        edit_IdRadio.setText(mispreferencias.getString("IdRadio", "1"));
-        edit_IP.setText(mispreferencias.getString("edit_IP", "idirect.dlinkddns.com"));
-        edit_Port.setText(mispreferencias.getString("edit_Port", "9001"));
-        edit_PortKA.setText(mispreferencias.getString("edit_PortKA", "9002"));
-        edit_TimerKA.setText(mispreferencias.getString("edit_TimerKA", "10"));
-       edit_DuracionVideo.setText(String.valueOf(mispreferencias.getInt("edit_DuracionVideo", 10)));
-        toggleAudio.setChecked(mispreferencias.getBoolean("audioBool", true));
-        toggle_ka.setChecked(mispreferencias.getBoolean("boolKA", true));
-        switch_muteAlarm.setChecked(mispreferencias.getBoolean("muteAlarm",false));
-        Log.d(TAG, "Preferencias Cargadas , boolKA: " + toggle_ka.isChecked());
-
- }
-
-    public void GuardarPreferencias() {
-
-        SharedPreferences mispreferencias = getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = mispreferencias.edit();
-        editor.putString("IdRadio", edit_IdRadio.getText().toString());
-        editor.putString("edit_IP", edit_IP.getText().toString());
-        editor.putString("edit_Port", edit_Port.getText().toString());
-        editor.putString("edit_PortKA", edit_PortKA.getText().toString());
-        editor.putString("edit_TimerKA", edit_TimerKA.getText().toString());
-        editor.putInt("edit_DuracionVideo", Integer.parseInt(edit_DuracionVideo.getText().toString()));
-        editor.putBoolean("audioBool", toggleAudio.isChecked());
-        editor.putBoolean("boolKA", toggle_ka.isChecked());
-        editor.putBoolean("muteAlarm", switch_muteAlarm.isChecked());
-        editor.commit();
-        Log.d(TAG, "Preferencias Guardadas , boolKA: " + mispreferencias.getBoolean("boolKA", true));
-
-    }
-
-// //////////////////////////////////////////////////////////
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-    // Inflate the menu; this adds items to the action bar if it is present.
-    getMenuInflater().inflate(R.menu.menu_main, menu);
-    return true;
-}
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-
-            Intent intent=new Intent(this,Lay_Configuracion.class);
-            startActivity(intent);
-            return true;
-        }
-        if (id == R.id.about) {
-
-           Toast.makeText(getApplicationContext(), "Correo del desarrollador:\n diegogiovanazzi@gmail.com" +
-                   " correo: DiegoGiovanazzi@gmail.com", Toast.LENGTH_LONG).show();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     private void EnviarFTP(){
 
@@ -975,66 +821,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void conectarBluetooth() {
-
-        BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
-
-            // Two things are needed to make a connection:
-            //   A MAC address, which we got above.
-            //   A Service ID or UUID.  In this case we are using the
-            //     UUID for SPP.
-
-            try {
-                btSocket = createBluetoothSocket(device);
-                conexionBlue=true;
-            } catch (IOException e1) {
-                errorExit("Fatal Error", "In onResume() and socket create failed: " + e1.getMessage() + ".");
-                conexionBlue=false;
-            }
-
-            // Discovery is resource intensive.  Make sure it isn't going on
-            // when you attempt to connect and pass your message.
-            btAdapter.cancelDiscovery();
 
 
-            // Establish the connection.  This will block until it connects.
-            Log.d(TAG, "...Connecting...");
-            try {
-                btSocket.connect();
+ ////////////////   bROADCAST RECEIVERS
 
 
-                Toast.makeText(getApplicationContext(),"se conectoooo",Toast.LENGTH_SHORT).show();
-
-                Log.d(TAG, "...Connection ok...");
-            } catch (IOException e) {
-                try {
-                    btSocket.close();
-                } catch (IOException e2) {
-                    errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
-                }
-            }
-
-            // Create a data stream so we can talk to server.
-            Log.d(TAG, "...Create Socket...");
-
-            try {
-                outStream = btSocket.getOutputStream();
-            } catch (IOException e) {
-                errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
-            }
-            mConnectedThread = new ConnectedThread(btSocket);
-            mConnectedThread.start();
-        }
-
-    //The BroadcastReceiver that listens for bluetooth broadcasts
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+  private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
           if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
                 //Device is now connected
-              conexionBlue=true;
+              CONEXIONBLUE=true;
                 Toast.makeText(getApplicationContext(),"Device is now connected",Toast.LENGTH_SHORT).show();
               ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," 1 13");
               ClienteTCP.start();
@@ -1045,7 +844,7 @@ public class MainActivity extends AppCompatActivity {
             else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
                 //Device has disconnected
 
-              conexionBlue=false;
+              CONEXIONBLUE=false;
 
               Toast.makeText(getApplicationContext(),"Device has disconnected",Toast.LENGTH_SHORT).show();
 
@@ -1089,13 +888,18 @@ public class MainActivity extends AppCompatActivity {
 
                                     break;
 
-                                case "Blue":
-                                    sms=new EnviarSMS(context,phoneNumber,"Solicitud de Conexión bluetooth:ok");
+                                case "BlueOn":
+                                    sms=new EnviarSMS(context,phoneNumber,"Solicitud de Conexión bluetooth:On");
                                     sms.sendSMS();
 
-                                    conexionBlue=false;
+                                    CONEXIONBLUE=true;
                                     break;
+                                case "BlueOff":
+                                    sms=new EnviarSMS(context,phoneNumber,"Solicitud de Conexión bluetooth:Off");
+                                    sms.sendSMS();
 
+                                    CONEXIONBLUE=false;
+                                    break;
                                 case "Kill":
                                     sms=new EnviarSMS(context,phoneNumber,"Kill Aplication:ok");
                                     sms.sendSMS();
@@ -1160,27 +964,172 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+         ////////////////////////fUNCIONES Bluettoh
+
+
+
+    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
+        if(Build.VERSION.SDK_INT >= 10){
+            try {
+                final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", new Class[] { UUID.class });
+                return (BluetoothSocket) m.invoke(device, MY_UUID);
+            } catch (Exception e) {
+                Log.e(TAG, "Could not create Insecure RFComm Connection",e);
+            }
+        }
+        return  device.createRfcommSocketToServiceRecord(MY_UUID);
+    }
+
+    private void checkBTState() {
+        // Check for Bluetooth support and then check to make sure it is turned on
+        // Emulator doesn't support Bluetooth and will return null
+        if(btAdapter==null) {
+            errorExit("Fatal Error", "Bluetooth not support");
+        } else {
+            if (btAdapter.isEnabled()) {
+                Log.d(TAG, "...Bluetooth ON...");
+            } else {
+                //Prompt user to turn on Bluetooth
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, 1);
+            }
+        }
+
+    }
+
+    private void errorExit(String title, String message){
+        finish();
+        Toast.makeText(getApplicationContext(),"Errorrr",Toast.LENGTH_SHORT).show();
+    }
+
+    private class ConnectedThread extends Thread {
+
+        private final InputStream mmInStream;
+        private final OutputStream mmOutStream;
+
+        public ConnectedThread(BluetoothSocket socket) {
+            InputStream tmpIn = null;
+            OutputStream tmpOut = null;
+
+            // Get the input and output streams, using temp objects because
+            // member streams are final
+            try {
+                tmpIn = socket.getInputStream();
+                tmpOut = socket.getOutputStream();
+            } catch (IOException e) {
+            }
+
+
+            mmInStream = tmpIn;
+            mmOutStream = tmpOut;
+        }
+
+        public void run() {
+            byte[] buffer = new byte[256];  // buffer store for the stream
+            int bytes; // bytes returned from read()
+
+            // Keep listening to the InputStream until an exception occurs
+            while (true) {
+                try {
+                    // Read from the InputStream
+                    bytes = mmInStream.read(buffer);        // Get number of bytes and message in "buffer"
+                    h.obtainMessage(RECIEVE_MESSAGE, bytes, -1, buffer).sendToTarget();     // Send to message queue Handler
+                } catch (IOException e) {
+
+
+                    break;
+                }
+            }
+        }
+
+        /* Call this from the main activity to send data to the remote device */
+        public void write(String message) {
+            Log.d(TAG, "...Data to send: " + message + "...");
+
+            BLUE_PRUEBA_STATIC=message;
+
+           // byte[] msgBuffer = message.getBytes();
+            byte[] msgBuffer = BLUE_PRUEBA_STATIC.getBytes();
+            try {
+                mmOutStream.write(msgBuffer);
+            } catch (IOException e) {
+                Log.d(TAG, "...Error data send: " + e.getMessage() + "...");
+            }
+        }
+
+    }
+
+    public void conectarBluetooth() {
+
+        BluetoothDevice device = btAdapter.getRemoteDevice(address);// mac address de bluetooth
+
+        // Two things are needed to make a connection:
+        //   A MAC address, which we got above.
+        //   A Service ID or UUID.  In this case we are using the
+        //     UUID for SPP.
+
+        try {
+            btSocket = createBluetoothSocket(device);
+          //  CONEXIONBLUE=true;
+        } catch (IOException e1) {
+            errorExit("Fatal Error", "In onResume() and socket create failed: " + e1.getMessage() + ".");
+         //   CONEXIONBLUE=false;
+        }
+
+        // Discovery is resource intensive.  Make sure it isn't going on
+        // when you attempt to connect and pass your message.
+        btAdapter.cancelDiscovery();
+
+
+        // Establish the connection.  This will block until it connects.
+        Log.d(TAG, "...Connecting...");
+        try {
+            btSocket.connect();
+
+
+            Toast.makeText(getApplicationContext(),"se conectoooo",Toast.LENGTH_SHORT).show();
+
+            Log.d(TAG, "...Connection ok...");
+        } catch (IOException e) {
+            try {
+                btSocket.close();
+            } catch (IOException e2) {
+                errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
+            }
+        }
+
+        // Create a data stream so we can talk to server.
+        Log.d(TAG, "...Create Socket...");
+
+        try {
+            outStream = btSocket.getOutputStream();
+        } catch (IOException e) {
+            errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
+        }
+        mConnectedThread = new ConnectedThread(btSocket);
+        mConnectedThread.start();
+    }
+
 
     public class ThreadBluetooth implements Runnable{
-
 
         @Override
         public void run() {
 
             while(true) {
 
-                while(!conexionBlue) {
+                while(!CONEXIONBLUE) {
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Log.d(TAG,"intento de conexion bluettoh");
-                            Toast.makeText(getApplicationContext(), "intento de conexion bluettoth", Toast.LENGTH_SHORT).show();
+                          //  Toast.makeText(getApplicationContext(), "intento de conexion bluettoth", Toast.LENGTH_SHORT).show();
                           conectarBluetooth();
                         }
                     });
                     try {
-                        Thread.sleep(10000);
+                        Thread.sleep(5000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -1191,8 +1140,79 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    ///////////////////// PREFERENCIAS DE USUARIO ////////////////
+    public void CargarPreferencias(){
+
+        SharedPreferences mispreferencias=getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
+        edit_IdRadio.setText(mispreferencias.getString("IdRadio", "1"));
+        edit_IP.setText(mispreferencias.getString("edit_IP", "idirect.dlinkddns.com"));
+        edit_Port.setText(mispreferencias.getString("edit_Port", "9001"));
+        edit_PortKA.setText(mispreferencias.getString("edit_PortKA", "9002"));
+        edit_TimerKA.setText(mispreferencias.getString("edit_TimerKA", "10"));
+        edit_DuracionVideo.setText(String.valueOf(mispreferencias.getInt("edit_DuracionVideo", 10)));
+        toggleAudio.setChecked(mispreferencias.getBoolean("audioBool", true));
+        toggle_ka.setChecked(mispreferencias.getBoolean("boolKA", true));
+        switch_muteAlarm.setChecked(mispreferencias.getBoolean("muteAlarm",false));
+        Log.d(TAG, "Preferencias Cargadas , boolKA: " + toggle_ka.isChecked());
 
     }
+
+    public void GuardarPreferencias() {
+
+        SharedPreferences mispreferencias = getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = mispreferencias.edit();
+        editor.putString("IdRadio", edit_IdRadio.getText().toString());
+        editor.putString("edit_IP", edit_IP.getText().toString());
+        editor.putString("edit_Port", edit_Port.getText().toString());
+        editor.putString("edit_PortKA", edit_PortKA.getText().toString());
+        editor.putString("edit_TimerKA", edit_TimerKA.getText().toString());
+        editor.putInt("edit_DuracionVideo", Integer.parseInt(edit_DuracionVideo.getText().toString()));
+        editor.putBoolean("audioBool", toggleAudio.isChecked());
+        editor.putBoolean("boolKA", toggle_ka.isChecked());
+        editor.putBoolean("muteAlarm", switch_muteAlarm.isChecked());
+        editor.commit();
+        Log.d(TAG, "Preferencias Guardadas , boolKA: " + mispreferencias.getBoolean("boolKA", true));
+
+    }
+
+
+    ///////////////////////MENU /////////////////////////////
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+
+            Intent intent=new Intent(this,Lay_Configuracion.class);
+            startActivity(intent);
+            return true;
+        }
+        if (id == R.id.about) {
+
+            Toast.makeText(getApplicationContext(), "Correo del desarrollador:\n diegogiovanazzi@gmail.com" +
+                    " correo: DiegoGiovanazzi@gmail.com", Toast.LENGTH_LONG).show();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+
+}
 
 
 

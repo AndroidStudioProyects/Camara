@@ -35,11 +35,16 @@ public class Root extends AsyncTask<String,Void,Void> {
             }
         }
         else{
-            Toast.makeText(context, "Phone not Rooted", Toast.LENGTH_SHORT).show();
+                publishProgress();
         }
 
         return null;
     }
 
+    @Override
+    protected void onProgressUpdate(Void... values) {
+        super.onProgressUpdate(values);
+        Toast.makeText(context, "Phone not Rooted", Toast.LENGTH_SHORT).show();
 
+    }
 }
