@@ -364,6 +364,13 @@
                 android:text="New Text"
                 android:id="@+id/text_GPS" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Conexion Bluetooth: ?"
+                android:id="@+id/txtConexionBluetooth"
+                android:layout_gravity="center_horizontal" />
+
         </LinearLayout>
     </ScrollView>
 
