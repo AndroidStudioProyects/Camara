@@ -206,14 +206,6 @@
                     android:text="RX: "
                     android:id="@+id/textView" />
 
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textin"
-                    android:layout_weight="0.37"
-                    android:enabled="false"
-                    android:focusable="true" />
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -305,12 +297,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:weightSum="1">
-
-                <EditText
-                    android:id="@+id/textout"
-                    android:layout_width="53dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right" />
 
                 <Button
                     android:id="@+id/send"
