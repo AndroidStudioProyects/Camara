@@ -145,22 +145,13 @@ public class MainActivity extends AppCompatActivity {
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         checkBTState();//Checkeo el estado
 
-/// BroadcastReceiver  Bluettoth
-
-        IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
-        IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
-        IntentFilter filter3 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-
-        this.registerReceiver(mReceiver, filter1);
-        this.registerReceiver(mReceiver, filter2);
-        this.registerReceiver(mReceiver, filter3);
-
         BroadcastSMS();
 
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 switch (msg.what) {
-                    case RECIEVE_MESSAGE:                                                   // if receive massage
+                    case RECIEVE_MESSAGE:
+                                           // if receive massage
                         byte[] readBuf = (byte[]) msg.obj;
                         String strIncom = new String(readBuf, 0, msg.arg1);                 // create string from bytes array
                         sb.append(strIncom);                                                // append string
@@ -168,21 +159,19 @@ public class MainActivity extends AppCompatActivity {
                         if (endOfLineIndex > 0) {                                            // if end-of-line,
 
                             String sbprint = sb.substring(0, endOfLineIndex);               // extract string
-                            Toast.makeText(getBaseContext(), "Alarma: '" + sbprint + "'", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getBaseContext(), "Arduino: '" + sbprint + "'", Toast.LENGTH_LONG).show();
                             Alarmabluetooth = sbprint;
                             sb.delete(0, sb.length());                                      // and clear
-                            Log.d(TAG, "Alarma recibida: " + Alarmabluetooth);
+                            Log.d(TAG, "Mensaje del Arduino: " + Alarmabluetooth);
                             switch (Alarmabluetooth){
                                 case "n":
-                                   Toast.makeText(getApplicationContext(),"Puerta Cerrada",Toast.LENGTH_SHORT).show();
+                             //      Toast.makeText(getApplicationContext(),"Puerta Cerrada",Toast.LENGTH_SHORT).show();
                                     break;
                                 case "s":
-                                    Toast.makeText(getApplicationContext(),"Puerta Abierta",Toast.LENGTH_SHORT).show();
-
+                               //     Toast.makeText(getApplicationContext(),"Puerta Abierta",Toast.LENGTH_SHORT).show();
                                     break;
                                 case "A":
                                     if (!MUTEALARM) {
-
                                         alarmas = new Thread(new CheckAlarmas(IdRadiobase, "2", IpPublica, 9001, getApplicationContext(), audioBool));
                                         alarmas.start();
                                         Filmacion();
@@ -198,31 +187,37 @@ public class MainActivity extends AppCompatActivity {
                                     break;
                                 case "C":
                                     if (!MUTEALARM) {
-
                                         alarmas = new Thread(new CheckAlarmas(IdRadiobase, "2", IpPublica, 9001, getApplicationContext(), audioBool));
                                         alarmas.start();
                                         Filmacion();
                                     }
                                     break;
+                                default:break;
 
 
                             }
 
                         }
                         break;
+
                 }
+
             }
         };
 
         servicio=new ServicioGPS(getApplicationContext());
-      //  servicio.setView(text_GPS);
         text_GPS.setText(servicio.LatyLong());
         LatyLong=servicio.LatyLong();
 
+/// BroadcastReceiver  Bluettoth
 
+        IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
+     //   IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+        IntentFilter filter3 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
 
-  //      mCamera.startPreview();
-
+        this.registerReceiver(mReceiver, filter1);
+     //   this.registerReceiver(mReceiver, filter2);
+        this.registerReceiver(mReceiver, filter3);
 
     }
 
@@ -254,10 +249,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "OnDestroy");
         releaseMediaRecorder();       // if you are using MediaRecorder, release it first
         releaseCamera();              // release the camera immediately on pause event
-        MUTEALARM=false;
-        /// bluetooth
-
-        //
         if (outStream != null) {
             try {
                 outStream.flush();
@@ -394,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Log.d(TAG, "Alarma Intrusion");
-          textIn.setText("2");
+
 
 
             }
@@ -405,7 +396,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Log.d(TAG, "Alarma de Apertura");
-                textIn.setText("3");
+
 
             }
         });
@@ -414,8 +405,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-          Log.d(TAG, "Alarma de Energia");
-                textIn.setText("4");
+                Log.d(TAG, "Alarma de Energia");
+
 
 
             }
@@ -425,12 +416,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                final String textToSend = textOut.getText().toString();
-                if (textToSend != "") {
-                    stringToRx = "";
-                    textIn.setText("");
 
-                }
 
             }
         });
@@ -438,13 +424,13 @@ public class MainActivity extends AppCompatActivity {
         tb_Led.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
+                if(isChecked) {
                     Log.d(TAG, "Led ON");
-                    Toast.makeText(getApplicationContext(), "Led ON", Toast.LENGTH_SHORT).show();
+                 //   Toast.makeText(getApplicationContext(), "Led ON", Toast.LENGTH_SHORT).show();
                     BLUE_PRUEBA_STATIC="s\n";
                     mConnectedThread.write(BLUE_PRUEBA_STATIC);
                 }else{
-                    Toast.makeText(getApplicationContext(), "Led OFF", Toast.LENGTH_SHORT).show();
+                 //   Toast.makeText(getApplicationContext(), "Led OFF", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "Led Off");
                     BLUE_PRUEBA_STATIC="n\n";
                     mConnectedThread.write(BLUE_PRUEBA_STATIC);
@@ -837,15 +823,12 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
-                //Device has disconnected
-                 //   Toast.makeText(getApplicationContext(),"Device has disconnected",Toast.LENGTH_SHORT).show();
-
                 ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," 1 5");
                 ClienteTCP.start();
             //    EnviarSMS sms=new EnviarSMS(context,Diego,"Bluetooth Desconectado");
             //    sms.sendSMS();
                 CONEXIONBLUE=false;
-                Log.d(TAG, " Broadcast ACTION_ACL_DISCONNECTED CONEXIONBLUE: " + CONEXIONBLUE);
+                Log.d(TAG, " BluetoothDesconectado!! ");
                 txtConexionBluetooth.setText("Conexionbluetooth:"+CONEXIONBLUE);
 
 
@@ -860,8 +843,8 @@ public class MainActivity extends AppCompatActivity {
           //    EnviarSMS sms=new EnviarSMS(context,Diego,"Bluetooth Conectado");
           //    sms.sendSMS();
                CONEXIONBLUE=true;
-              txtConexionBluetooth.setText("Conexionbluetooth:" + CONEXIONBLUE);
-              Log.d(TAG, " Broadcast ACTION_ACL_CONNECTE CONEXIONBLUE: " + CONEXIONBLUE);
+              txtConexionBluetooth.setText("ConexionBluetooth: " + CONEXIONBLUE);
+              Log.d(TAG, " Bluetooth Conectado !! ");
 
           }
             if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
@@ -873,7 +856,7 @@ public class MainActivity extends AppCompatActivity {
               //  sms.sendSMS();
                 CONEXIONBLUE = false;
 
-                Log.d(TAG, " Broadcast ACTION_ACL_CONNECTE CONEXIONBLUE: " + CONEXIONBLUE);
+                Log.d(TAG, "Requerimiento de Desconexion del Bluetooth ");
                 txtConexionBluetooth.setText("Conexionbluetooth:" + CONEXIONBLUE);
 
             }
@@ -1022,7 +1005,7 @@ public class MainActivity extends AppCompatActivity {
     private void errorExit(String title, String message){
         finish();
         CONEXIONBLUE=false;
-        Toast.makeText(getApplicationContext(),"Errorrr",Toast.LENGTH_SHORT).show();
+   //     Toast.makeText(getApplicationContext(),"Errorrr",Toast.LENGTH_SHORT).show();
     }
 
     private class ConnectedThread extends Thread {
@@ -1108,17 +1091,15 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "...Connecting...");
         try {
             btSocket.connect();
-
-
           Toast.makeText(getApplicationContext(),"se conectoooo",Toast.LENGTH_SHORT).show();
-            CONEXIONBLUE=true;
+           CONEXIONBLUE=true;
 
             Log.d(TAG, "...Connection ok...");
         } catch (IOException e) {
             try {
                 btSocket.close();
-                CONEXIONBLUE=false;
-
+          //      CONEXIONBLUE=false;
+                Log.d(TAG, "...Cerro Socket...");
             } catch (IOException e2) {
                 errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
             }
@@ -1141,29 +1122,46 @@ public class MainActivity extends AppCompatActivity {
 
     public class ThreadBluetooth implements Runnable{
 
+
+
+
+        private  int  c;
+
         @Override
         public void run() {
 
             while(true) {
-
+                   c=0;
                    while(!CONEXIONBLUE) {
 
+                       c++;
                        runOnUiThread(new Runnable() {
                            @Override
                            public void run() {
-                               Log.d(TAG, "intento de conexion bluetooth");
-                               Toast.makeText(getApplicationContext(),"intento de conexion bluetooth", Toast.LENGTH_SHORT).show();
+                             //  txtConexionBluetooth.setText("ConexionBluettoh: false");
+                               Log.d(TAG, "intento " + c + "  de conexion bluetooth");
+                          //     Toast.makeText(getApplicationContext(),"intento "+c+" de conexion bluetooth", Toast.LENGTH_SHORT).show();
+                              // long start = System.currentTimeMillis();
                                conectarBluetooth();
+
+                               // calcular tiempo transcurrido
+                              // long end = System.currentTimeMillis();
+                              // long res = end - start;
+                              // Log.d(TAG, "Tiempo de conexion Bluetooth: " + res / 1000+" seg.");
                            }
                        });
 
-
+                       Log.d(TAG, "Tiempo de espera  de reconexion iniciado");
                        try {
-                           Thread.sleep(7000);
+                           Thread.sleep(10000);
                        } catch (InterruptedException e) {
                            e.printStackTrace();
                        }
+                       Log.d(TAG, "Tiempo de espera  de reconexion terminado");
+                       if(c==5){break;}
                 }
+
+
             }
 
 
