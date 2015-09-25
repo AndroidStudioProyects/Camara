@@ -59,7 +59,7 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity {
 
 
-    public static final String Diego = "02235776581";
+    public static String Diego = "02235776581";
     public static String LatyLong;
     public static String BLUE_PRUEBA_STATIC;
     public static Boolean MUTEALARM = false;
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     ToggleButton toggleAudio, toggle_ka;
     Switch switch_muteAlarm;
-    static EditText  edit_IP, edit_Port, edit_IdRadio,  edit_TimerKA, edit_PortKA, edit_DuracionVideo;
+    static EditText  edit_IP, edit_Port, edit_IdRadio,  edit_TimerKA, edit_PortKA, edit_DuracionVideo,edit_Telefono;
     Button buttonSend, btn_Prueba, btn_Foto, btn_Video, btn_Intrusion, btn_USB;
     Button btn_Energia, btn_Apertura, btn_Conf_FTP, btn_Enviar_FTP;
     Button btn_Reboot,btn_BlueConnect;
@@ -139,6 +139,8 @@ public class MainActivity extends AppCompatActivity {
 
         IdRadiobase = Integer.parseInt(edit_IdRadio.getText().toString());
         IpPublica = edit_IP.getText().toString();
+        Diego=edit_Telefono.getText().toString();
+        Toast.makeText(this, Diego, Toast.LENGTH_SHORT).show();
         //      BotonesEnabled(false);
         CAMARA_ON();
         ////defino bluetooth adapter
@@ -225,13 +227,10 @@ public class MainActivity extends AppCompatActivity {
 /// BroadcastReceiver  Bluettoth
 
         IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
-     //   IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
         IntentFilter filter3 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
 
         this.registerReceiver(mReceiver, filter1);
-     //   this.registerReceiver(mReceiver, filter2);
         this.registerReceiver(mReceiver, filter3);
-     //   conectarBluetooth();
 
     }
 
@@ -483,7 +482,7 @@ public class MainActivity extends AppCompatActivity {
                     GuardarPreferencias();
                     IdRadiobase = Integer.parseInt(edit_IdRadio.getText().toString());
                     IpPublica = edit_IP.getText().toString();
-
+                    Diego=edit_Telefono.getText().toString();
                     intentKeepAlive = new Intent(getApplicationContext(), KeepAlive.class);
                     intentKeepAlive.putExtra("bool", true);
                     startService(intentKeepAlive);
@@ -516,6 +515,7 @@ public class MainActivity extends AppCompatActivity {
         edit_TimerKA= (EditText) findViewById(R.id.edit_TimerKA);
         edit_PortKA=(EditText)findViewById(R.id.edit_PortKA);
         edit_DuracionVideo=(EditText)findViewById(R.id.edit_DuracionVideo);
+        edit_Telefono=(EditText)findViewById(R.id.edit_Telefono);
 
         toggle_ka= (ToggleButton) findViewById(R.id.toggle_ka);
         toggleAudio= (ToggleButton) findViewById(R.id.toggleAudio);
@@ -767,7 +767,7 @@ public class MainActivity extends AppCompatActivity {
     //////////////////////////--- FOTO Y VIDEO ----//////////////////////
 
     private void BotonesEnabled (boolean ena){
-
+        edit_Telefono.setEnabled(!ena);
         edit_IdRadio.setEnabled(!ena);
         edit_IP.setEnabled(!ena);
         edit_Port.setEnabled(!ena);
@@ -1218,6 +1218,7 @@ public class MainActivity extends AppCompatActivity {
     public void CargarPreferencias(){
 
         SharedPreferences mispreferencias=getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
+        edit_Telefono.setText(mispreferencias.getString("Telefono","02235776581"));
         edit_IdRadio.setText(mispreferencias.getString("IdRadio", "1"));
         edit_IP.setText(mispreferencias.getString("edit_IP", "idirect.dlinkddns.com"));
         edit_Port.setText(mispreferencias.getString("edit_Port", "9001"));
@@ -1235,6 +1236,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences mispreferencias = getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mispreferencias.edit();
+        editor.putString("Telefono",edit_Telefono.getText().toString());
         editor.putString("IdRadio", edit_IdRadio.getText().toString());
         editor.putString("edit_IP", edit_IP.getText().toString());
         editor.putString("edit_Port", edit_Port.getText().toString());

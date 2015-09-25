@@ -78,6 +78,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/edit_IP"
+
                     android:text="idirect.dlinkddns.com"
                     android:focusable="true" />
 
@@ -88,6 +89,32 @@
                     android:id="@+id/tb_Led"
                     android:checked="false" />
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TELEFONO:"
+                        android:id="@+id/textView17" />
+
+                    <EditText
+                        android:layout_width="165dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:ems="10"
+                        android:id="@+id/edit_Telefono"
+                        android:text="02235776581" />
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -108,6 +135,7 @@
                     android:layout_width="58dp"
                     android:layout_height="wrap_content"
                     android:inputType="number"
+
                     android:ems="10"
                     android:id="@+id/edit_Port"
                     android:text="9001" />

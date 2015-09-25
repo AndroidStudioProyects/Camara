@@ -20,6 +20,8 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
@@ -108,9 +110,9 @@ public class ConnectUploadAsync extends AsyncTask<Void,Integer,Boolean> {
             InputStream inputStream = new FileInputStream(secondLocalFile);
 
             System.out.println("Start uploading second file");
+            String timeStamp = new SimpleDateFormat("yyyy_MM_dd").format(new Date());
 
-
-            boolean created=mFtpClient.makeDirectory("Radiobase_ID_"+IdRadio);
+            boolean created=mFtpClient.makeDirectory("Radiobase_ID_"+IdRadio+"/"+timeStamp);
             if(created){
 
             }else{
@@ -118,7 +120,7 @@ public class ConnectUploadAsync extends AsyncTask<Void,Integer,Boolean> {
             }
 
 
-            OutputStream outputStream = mFtpClient.storeFileStream("Radiobase_ID_"+IdRadio+"/"+secondRemoteFile);
+            OutputStream outputStream = mFtpClient.storeFileStream("Radiobase_ID_"+IdRadio+"/"+timeStamp+"/"+secondRemoteFile);
 
             int ancho = (int) secondLocalFile.length();
 
