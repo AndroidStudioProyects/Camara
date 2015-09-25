@@ -30,10 +30,10 @@ public class SmsRecibido extends BroadcastReceiver {
 
         SharedPreferences mispreferencias = context.getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
         String IP = mispreferencias.getString("edit_IP", "idirect.dlinkddns.com");
-
+        String Id=mispreferencias.getString("IdRadio", "1");
         int Puerto = Integer.parseInt(mispreferencias.getString("edit_Port", "9001"));
 
-        ConexionIP ClienteTCP = new ConexionIP(IP, Puerto, " 1 9");
+        ConexionIP ClienteTCP = new ConexionIP(IP, Puerto, " "+Id+" 9");
         ClienteTCP.start();
         servicio=new ServicioGPS(contexto);
 
@@ -49,27 +49,25 @@ public class SmsRecibido extends BroadcastReceiver {
                     String phoneNumber = currentMessage.getDisplayOriginatingAddress();
                     String senderNum = phoneNumber;
                     String message = currentMessage.getDisplayMessageBody();
+                    if(phoneNumber.toString().equals("02235776581")) {
+                        switch (message) {
 
-                    switch (message) {
+                             case "Inicio":
+                                Intent intento = new Intent(context, MainActivity.class);
+                                intento.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intento.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                context.startActivity(intento);
+                                sms = new EnviarSMS(context, "02235776581", "Solo Inicio de aplicacion");
+                                sms.sendSMS();
 
-                    case "Reboot":
-                        rebootDevice();
+                                ClienteTCP = new ConexionIP(IP, Puerto, " " + Id + " 19");
+                                ClienteTCP.start();
+                                break;
 
-                    break;
-                        case "Inicio": Intent intento= new Intent(context,MainActivity.class);
-                            intento.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            intento.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-
-                            context.startActivity(intento);
-
-                            sms=new EnviarSMS(context,"2235776581","Solo Inicio de aplicacion");
-                            sms.sendSMS();
-                            break;
-
-                        default:
-                        break;
+                            default:
+                                break;
+                        }
                     }
-
                 }
             }
         } catch (Exception e) {

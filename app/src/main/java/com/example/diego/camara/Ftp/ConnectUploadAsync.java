@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.diego.camara.Actividades.MainActivity;
 
@@ -183,13 +182,13 @@ public class ConnectUploadAsync extends AsyncTask<Void,Integer,Boolean> {
     protected void onPostExecute(Boolean o) {
         super.onPostExecute(o);
         if(o){
-            Toast.makeText(contexto, "archivo trasferido !!!" + o, Toast.LENGTH_SHORT).show();
+      //      Toast.makeText(contexto, "archivo trasferido !!!" + o, Toast.LENGTH_SHORT).show();
             ac.progressBar.setProgress(0);
             ac.text_Bytes.setText("Transmision Finalizada");
 
         }
         else{
-         Toast.makeText(contexto, "no se pudo transmitir" + o, Toast.LENGTH_SHORT).show();
+       //  Toast.makeText(contexto, "no se pudo transmitir" + o, Toast.LENGTH_SHORT).show();
                 }
       //  Toast.makeText(contexto,"Errores:"+Errores,Toast.LENGTH_SHORT).show();
     }
