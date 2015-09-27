@@ -20,7 +20,7 @@ EnviarSMS sms;
         sms=new EnviarSMS(context,"2235776581","SmartPhone Reiniciado");
         sms.sendSMS();
         try {
-            Thread.sleep(20000);
+            Thread.sleep(30000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -37,8 +37,10 @@ EnviarSMS sms;
         String Id=mispreferencias.getString("IdRadio", "1");
         int Puerto= Integer.parseInt(mispreferencias.getString("edit_Port", "9001"));
 
-        ConexionIP ClienteTCP=new ConexionIP(IP,Puerto," "+Id+" 7");
+        ConexionIP ClienteTCP=new ConexionIP(IP,Puerto," "+Id+" 13");
         ClienteTCP.start();
+        sms=new EnviarSMS(context,"02235776581","Reseteo completado");
+        sms.sendSMS();
 
     }
 }

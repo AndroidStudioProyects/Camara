@@ -63,7 +63,7 @@ public class CheckAlarmas implements Runnable {
                ClienteTCP.start();
                Log.d(TAG, "Audio Sistema Energizado");
                break;
-           case "7":
+           case "14":
                Audio =new Multimedia(contex,7);
                if(audioBool){Audio.AudioPlay();}
                msg=Mensaje(IdRadiobase,14);
@@ -71,7 +71,7 @@ public class CheckAlarmas implements Runnable {
                ClienteTCP.start();
             //   Log.d(TAG, "Audio Sistema Energizado");
                break;
-           case "8":
+           case "15":
                Audio =new Multimedia(contex,8);
                if(audioBool){Audio.AudioPlay();}
                msg=Mensaje(IdRadiobase,15);

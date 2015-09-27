@@ -55,12 +55,6 @@
                     android:textOff="off"
                     android:textOn="on" />
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Reboot"
-                    android:id="@+id/btn_Reboot" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -114,6 +108,21 @@
                         android:ems="10"
                         android:id="@+id/edit_Telefono"
                         android:text="02235776581" />
+
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Led"
+                        android:id="@+id/btn_Led" />
+
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Loop"
+                        android:id="@+id/btn_Loop" />
+
                 </LinearLayout>
             </LinearLayout>
 
@@ -248,8 +257,14 @@
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Reconectar Bluetooth"
+                    android:text="Conect blue"
                     android:id="@+id/btn_BlueConnect" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Blue R"
+                    android:id="@+id/btn_BlueReset" />
 
             </LinearLayout>
 
