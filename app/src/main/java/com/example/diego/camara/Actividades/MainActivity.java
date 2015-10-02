@@ -221,6 +221,14 @@ public class MainActivity extends AppCompatActivity {
                                     break;
                                 case "C":
                                     if (!MUTEALARM) {
+                                        alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_INTRUSION, IpPublica, 9001, getApplicationContext(), audioBool));
+                                        alarmas.start();
+
+                                        Filmacion();
+                                    }
+                                    break;
+                                case "D":
+                                    if (!MUTEALARM) {
                                         alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_APERTURA, IpPublica, 9001, getApplicationContext(), audioBool));
                                         alarmas.start();
 
