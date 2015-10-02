@@ -63,6 +63,7 @@ public class CheckAlarmas implements Runnable {
                ClienteTCP.start();
                Log.d(TAG, "Audio Sistema Energizado");
                break;
+
            case "14":
                Audio =new Multimedia(contex,7);
                if(audioBool){Audio.AudioPlay();}
@@ -93,7 +94,14 @@ public class CheckAlarmas implements Runnable {
                ClienteTCP.start();
                Log.d(TAG, "Aplicacion Cerrada");
                break;
-
+           case "25":
+               Audio =new Multimedia(contex,9);
+               if(audioBool){Audio.AudioPlay();}
+               msg=Mensaje(IdRadiobase,25);
+               ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
+               ClienteTCP.start();
+               Log.d(TAG, "Audio Personal no Autorizado");
+               break;
            default:
 
                Log.d(TAG, "Alarma Default");

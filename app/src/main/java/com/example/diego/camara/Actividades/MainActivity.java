@@ -90,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String OPEN_DOOR="21";
     public static final String LOOP_EXITOSO="22";
     public static final String RESET_BLUETOOTH="23";
-
+    public static final String CONEXION_BLUETOOTH_EXITOSA="24";
+    public static final String PERSONAL_NO_AUTORIZADO="25";
 
     ///////////////////////////////
 
@@ -141,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
     Camera.Parameters parameters;
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
-    private int calidadFoto = 90;
+    private int calidadFoto = 100;
     public static Boolean Bandera = false;
     static final String TAG = "Camara";
     boolean audioBool = false;
@@ -206,21 +207,23 @@ public class MainActivity extends AppCompatActivity {
                                     if (!MUTEALARM) {
                                         alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_INTRUSION, IpPublica, 9001, getApplicationContext(), audioBool));
                                         alarmas.start();
+                                        mCamera.takePicture(null, null, mPicture);
                                         Filmacion();
                                     }
                                  break;
                                 case "B":
                                     if (!MUTEALARM) {
 
-                                        alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_APERTURA, IpPublica, 9001, getApplicationContext(), audioBool));
+                                        alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_INTRUSION, IpPublica, 9001, getApplicationContext(), audioBool));
                                         alarmas.start();
                                         Filmacion();
                                     }
                                     break;
                                 case "C":
                                     if (!MUTEALARM) {
-                                        alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_INTRUSION, IpPublica, 9001, getApplicationContext(), audioBool));
+                                        alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_APERTURA, IpPublica, 9001, getApplicationContext(), audioBool));
                                         alarmas.start();
+
                                         Filmacion();
                                     }
                                     break;
@@ -306,6 +309,7 @@ public class MainActivity extends AppCompatActivity {
         //new ThreadBlue().run();
         ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+INCIA_APLICACION);
         ClienteTCP.start();
+        //Toast.makeText(getApplicationContext(), (CharSequence) parameters.getPictureSize(),Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -626,8 +630,11 @@ public class MainActivity extends AppCompatActivity {
         }
         parameters.setRotation(90);
         parameters.setJpegQuality(calidadFoto);
-        //  String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-      //  parameters.setGpsTimestamp(Long.parseLong(timeStamp));
+        parameters.setRotation(90);
+    //    parameters.setPictureSize(350, 600);
+
+      //    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        //parameters.setGpsTimestamp(Long.parseLong(timeStamp));
        // parameters.setZoom(4);
 
         parameters.setVideoStabilization(true);
@@ -877,12 +884,14 @@ public class MainActivity extends AppCompatActivity {
                            }
 
             int Duracion =Integer.parseInt(edit_DuracionVideo.getText().toString());
-            Log.d(TAG,"Duracion del Video: "+Duracion+" Seg.");
+        Log.d(TAG,"Duracion del Video: "+Duracion+" Seg.");
             try {
                 Thread.sleep(Duracion*1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+
              if (isRecording) {
                 // stop recording and release camera
                  mMediaRecorder.stop();  // stop the recording
@@ -1060,7 +1069,11 @@ public class MainActivity extends AppCompatActivity {
                                     BLUE_PRUEBA_STATIC="F\n";
                                     mConnectedThread.write(BLUE_PRUEBA_STATIC);
                                     break;
-
+                                case "Pna":
+                                    Log.d(TAG, " Personal no autorizado POR SMS");
+                                    alarmas=new Thread(new CheckAlarmas(IdRadiobase,PERSONAL_NO_AUTORIZADO ,IpPublica, 9001, getApplicationContext(),audioBool));
+                                    alarmas.start();
+                                    break;
                                 case "On":
                                     Log.d(TAG, " SENSORES ACTIVADOS SMS");
 

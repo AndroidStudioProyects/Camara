@@ -9,7 +9,7 @@ import com.example.diego.camara.R;
  * Created by Diego on 14/05/2015.
  */
 public class Multimedia {
-    MediaPlayer mp2,mp3,mp4,mp6,mp7,mp8;
+    MediaPlayer mp2,mp3,mp4,mp6,mp7,mp8,mp9;
 
        static String TAG="Camara";
     Context contexto;
@@ -28,6 +28,7 @@ int Alarma;
         mp6= MediaPlayer.create(contexto, R.raw.energiarestablecida);
         mp7= MediaPlayer.create(contexto, R.raw.sensoresactivados);
         mp8= MediaPlayer.create(contexto, R.raw.sensoresdesactivados);
+        mp9= MediaPlayer.create(contexto, R.raw.personalnoautorizado);
 
     }
 
@@ -37,7 +38,6 @@ int Alarma;
 
             switch (Alarma) {
                 case 2:
-
                     mp2.start();
                     break;
                 case 3:
@@ -54,6 +54,9 @@ int Alarma;
                     break;
                 case 8:
                     mp8.start();
+                    break;
+                case 9:
+                    mp9.start();
                     break;
                 default:
                     break;
