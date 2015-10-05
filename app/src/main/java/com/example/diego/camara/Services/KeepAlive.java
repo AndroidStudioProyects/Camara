@@ -1,9 +1,12 @@
 package com.example.diego.camara.Services;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.BatteryManager;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -22,7 +25,9 @@ public class KeepAlive  extends Service {
     static boolean Bool=true;
     Intent intento;
     Hilo hilito;
-
+    static ServicioGPS geoloc;
+    static String geo;
+    static String Level,Voltage,Temperature,Status,Health;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -35,8 +40,12 @@ public class KeepAlive  extends Service {
         TiempoSeg = Integer.parseInt(mispreferencias.getString("edit_TimerKA", "10"));
         hilito=new Hilo();
         hilito.start();
-        Toast.makeText(getApplicationContext(), "Servicio Keep Alive iniciado", Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "OnStart Keep Alive Bool: "+Bool);
+        //geo=geoloc.LatyLong();
+       Toast.makeText(getApplicationContext(), "Servicio Keep Alive iniciado: ", Toast.LENGTH_SHORT).show();
+       // Log.d(TAG, "OnStart Keep Alive Bool: "+Bool);
+
+        this.registerReceiver(this.myBatteryReceiver,
+                new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 
       return START_STICKY;
     }
@@ -66,7 +75,7 @@ public class KeepAlive  extends Service {
 
             try {
                 Thread.sleep(TiempoSeg * 1000);
-                ClienteTCP=new ConexionIP(IpPublica,PuertoKA," "+IdRadiobase+" 1");
+                ClienteTCP=new ConexionIP(IpPublica,PuertoKA," "+IdRadiobase+" 1 "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+"-37.8669982,-58.0802339");
                 Log.d(TAG, "\nKeep Alive !! IpServer: " + IpPublica + " Puerto: " + PuertoKA + " TiempoSeg: " + TiempoSeg+" IdRadiobase: " + IdRadiobase);
                 ClienteTCP.start();
             } catch (InterruptedException e) {
@@ -75,4 +84,58 @@ public class KeepAlive  extends Service {
           //  Log.d(TAG, "KeepAlive run salida bool: "+Bool);
         }
     }
+
+
+
+    private BroadcastReceiver myBatteryReceiver = new BroadcastReceiver(){
+
+        @Override
+        public void onReceive(Context arg0, Intent arg1) {
+            // TODO Auto-generated method stub
+
+            if (arg1.getAction().equals(Intent.ACTION_BATTERY_CHANGED)){
+                Level=String.valueOf(arg1.getIntExtra("level", 0)) + "%";
+                Voltage=String.valueOf((float)arg1.getIntExtra("voltage", 0)/1000) + "V";
+                Temperature=String.valueOf((float)arg1.getIntExtra("temperature", 0)/10) + "c";
+
+
+                int status = arg1.getIntExtra("status", BatteryManager.BATTERY_STATUS_UNKNOWN);
+                String strStatus;
+                if (status == BatteryManager.BATTERY_STATUS_CHARGING){
+                    strStatus = "Charging";
+                } else if (status == BatteryManager.BATTERY_STATUS_DISCHARGING){
+                    strStatus = "Dis-charging";
+                } else if (status == BatteryManager.BATTERY_STATUS_NOT_CHARGING){
+                    strStatus = "Not charging";
+                } else if (status == BatteryManager.BATTERY_STATUS_FULL){
+                    strStatus = "Full";
+                } else {
+                    strStatus = "Unknown";
+                }
+                Status=strStatus;
+
+                int health = arg1.getIntExtra("health", BatteryManager.BATTERY_HEALTH_UNKNOWN);
+                String strHealth;
+                if (health == BatteryManager.BATTERY_HEALTH_GOOD){
+                    strHealth = "Good";
+                } else if (health == BatteryManager.BATTERY_HEALTH_OVERHEAT){
+                    strHealth = "Over Heat";
+                } else if (health == BatteryManager.BATTERY_HEALTH_DEAD){
+                    strHealth = "Dead";
+                } else if (health == BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE){
+                    strHealth = "Over Voltage";
+                } else if (health == BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE){
+                    strHealth = "Unspecified Failure";
+                } else{
+                    strHealth = "Unknown";
+                }
+                Health=strHealth;
+
+            }
+        }
+
+    };
+
+
+
 }
