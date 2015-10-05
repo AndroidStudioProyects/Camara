@@ -28,11 +28,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="ID RADIOBASE"
+                    android:text="ID RADIO"
                     android:id="@+id/textView5" />
 
                 <EditText
-                    android:layout_width="52dp"
+                    android:layout_width="33dp"
                     android:layout_height="wrap_content"
                     android:inputType="number"
                     android:ems="10"
@@ -43,7 +43,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Sonido"
+                    android:text="Audio"
                     android:id="@+id/textView11" />
 
                 <ToggleButton
@@ -54,6 +54,13 @@
                     android:checked="false"
                     android:textOff="off"
                     android:textOn="on" />
+
+                <Switch
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Sens Mute"
+                    android:id="@+id/switch_Alarma"
+                    android:checked="false" />
 
             </LinearLayout>
 
@@ -149,13 +156,6 @@
                     android:id="@+id/edit_Port"
                     android:text="9001" />
 
-                <Switch
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Al Mute"
-                    android:id="@+id/switch_Alarma"
-                    android:checked="false" />
-
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="wrap_content"
@@ -175,6 +175,18 @@
                         android:id="@+id/edit_DuracionVideo"
                         android:text="10" />
                 </LinearLayout>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="foto"
+                    android:id="@+id/btn_Captura" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="video"
+                    android:id="@+id/btn_Video" />
 
             </LinearLayout>
 
@@ -235,24 +247,6 @@
                 android:layout_height="wrap_content"
                 android:weightSum="1">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="RX: "
-                    android:id="@+id/textView" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ALARMA: "
-                    android:id="@+id/textView2" />
-
-                <TextView
-                    android:layout_width="44dp"
-                    android:layout_height="wrap_content"
-                    android:text="off"
-                    android:id="@+id/textAlarma1" />
-
                 <Button
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
@@ -265,6 +259,18 @@
                     android:layout_height="wrap_content"
                     android:text="Blue R"
                     android:id="@+id/btn_BlueReset" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FTP Conf"
+                    android:id="@+id/btn_Conf_FTP" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Send FTP"
+                    android:id="@+id/btn_Enviar_FTP" />
 
             </LinearLayout>
 
@@ -302,14 +308,8 @@
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="100dp">
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="foto"
-                    android:id="@+id/btn_Captura" />
+                android:layout_width="match_parent"
+                android:layout_height="111dp">
 
                 <FrameLayout
                     android:layout_width="187dp"
@@ -318,7 +318,7 @@
                     android:layout_gravity="center">
 
                     <SurfaceView
-                        android:layout_width="match_parent"
+                        android:layout_width="155dp"
                         android:layout_height="match_parent"
                         android:id="@+id/surfaceView"
                         android:layout_weight="0.63"
@@ -326,11 +326,60 @@
 
                 </FrameLayout>
 
-                <Button
+                <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="video"
-                    android:id="@+id/btn_Video" />
+                    android:layout_height="match_parent">
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="BatLev"
+                        android:id="@+id/batteryLevel" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="BatVot"
+                        android:id="@+id/batteryVoltage" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="BatTemp"
+                        android:id="@+id/batteryTemperature" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="BatTech"
+                        android:id="@+id/batteryTechnology" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Batstat"
+                        android:id="@+id/batteryStatus" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="BatHealth"
+                        android:id="@+id/batteryHealth" />
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -339,23 +388,6 @@
                 android:layout_height="wrap_content"
                 android:weightSum="1">
 
-                <Button
-                    android:id="@+id/send"
-                    android:layout_width="112dp"
-                    android:layout_height="wrap_content"
-                    android:text="Enviar Usb" />
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="FTP Conf"
-                    android:id="@+id/btn_Conf_FTP" />
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="enviar FTP"
-                    android:id="@+id/btn_Enviar_FTP" />
             </LinearLayout>
 
 
@@ -388,7 +420,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="New Text"
+                android:text="GPS"
                 android:id="@+id/text_GPS" />
 
             <TextView

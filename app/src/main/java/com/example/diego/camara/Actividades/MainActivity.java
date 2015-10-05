@@ -12,6 +12,7 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -126,10 +127,11 @@ public class MainActivity extends AppCompatActivity {
     ToggleButton toggleAudio, toggle_ka;
     Switch switch_muteAlarm;
     static EditText  edit_IP, edit_Port, edit_IdRadio,  edit_TimerKA, edit_PortKA, edit_DuracionVideo,edit_Telefono;
-    Button buttonSend, btn_Prueba, btn_Foto, btn_Video, btn_Intrusion, btn_USB;
+    Button  btn_Prueba, btn_Foto, btn_Video, btn_Intrusion, btn_USB;
     Button btn_Energia, btn_Apertura, btn_Conf_FTP, btn_Enviar_FTP;
     Button btn_Reboot,btn_BlueConnect,btn_Led,btn_Loop,btn_BlueReset;
-    public TextView textAlarma1, text_Bytes,text_GPS,txtConexionBluetooth;
+    public TextView  text_Bytes,text_GPS,txtConexionBluetooth;
+    TextView batteryLevel,batteryVoltage,batteryTemperature,batteryTechnology,batteryStatus,batteryHealth;
     public ProgressBar progressBar;
 
     String stringToRx;
@@ -207,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                                     if (!MUTEALARM) {
                                         alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_INTRUSION, IpPublica, 9001, getApplicationContext(), audioBool));
                                         alarmas.start();
-                                        mCamera.takePicture(null, null, mPicture);
+                                        //mCamera.takePicture(null, null, mPicture);
                                         Filmacion();
                                     }
                                  break;
@@ -231,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
                                     if (!MUTEALARM) {
                                         alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_APERTURA, IpPublica, 9001, getApplicationContext(), audioBool));
                                         alarmas.start();
-
+                                      //  mCamera.takePicture(null, null, mPicture);
                                         Filmacion();
                                     }
                                     break;
@@ -299,6 +301,11 @@ public class MainActivity extends AppCompatActivity {
 
         this.registerReceiver(mReceiver, filter1);
         this.registerReceiver(mReceiver, filter3);
+
+        this.registerReceiver(this.myBatteryReceiver,
+                new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+
+
 
     }
 
@@ -512,14 +519,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        buttonSend.setOnClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-
-
-            }
-        });
 
         tb_Led.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
@@ -582,10 +582,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void LevantarXML() {
 
-        textAlarma1 = (TextView) findViewById(R.id.textAlarma1);
-     //   textOut = (EditText) findViewById(R.id.textout);
         text_Bytes=(TextView)findViewById(R.id.text_Bytes);
         text_GPS=(TextView)findViewById(R.id.text_GPS);
+
+        batteryLevel= (TextView)findViewById(R.id.batteryLevel);
+        batteryVoltage= (TextView)findViewById(R.id.batteryVoltage);
+        batteryTemperature= (TextView)findViewById(R.id.batteryTemperature);
+        batteryTechnology= (TextView)findViewById(R.id.batteryTechnology);
+        batteryStatus= (TextView)findViewById(R.id.batteryStatus);
+        batteryHealth= (TextView)findViewById(R.id.batteryHealth);
+
         txtConexionBluetooth=(TextView)findViewById(R.id.txtConexionBluetooth);
         progressBar=(ProgressBar)findViewById(R.id.progressBar);
 
@@ -601,7 +607,6 @@ public class MainActivity extends AppCompatActivity {
         toggleAudio= (ToggleButton) findViewById(R.id.toggleAudio);
         tb_Led= (ToggleButton) findViewById(R.id.tb_Led);
 
-        buttonSend = (Button) findViewById(R.id.send);
         btn_Foto = (Button) findViewById(R.id.btn_Captura);
         btn_Video = (Button) findViewById(R.id.btn_Video);
         btn_Intrusion = (Button) findViewById(R.id.btn_Intrusion);
@@ -920,6 +925,61 @@ public class MainActivity extends AppCompatActivity {
     }
 
  ////////////////   bROADCAST RECEIVERS
+
+
+    private BroadcastReceiver myBatteryReceiver = new BroadcastReceiver(){
+
+        @Override
+        public void onReceive(Context arg0, Intent arg1) {
+            // TODO Auto-generated method stub
+
+            if (arg1.getAction().equals(Intent.ACTION_BATTERY_CHANGED)){
+                batteryLevel.setText("Level: "
+                        + String.valueOf(arg1.getIntExtra("level", 0)) + "%");
+                batteryVoltage.setText("Voltage: "
+                        + String.valueOf((float)arg1.getIntExtra("voltage", 0)/1000) + "V");
+                batteryTemperature.setText("Temperature: "
+                        + String.valueOf((float)arg1.getIntExtra("temperature", 0)/10) + "c");
+                batteryTechnology.setText("Technology: " + arg1.getStringExtra("technology"));
+
+                int status = arg1.getIntExtra("status", BatteryManager.BATTERY_STATUS_UNKNOWN);
+                String strStatus;
+                if (status == BatteryManager.BATTERY_STATUS_CHARGING){
+                    strStatus = "Charging";
+                } else if (status == BatteryManager.BATTERY_STATUS_DISCHARGING){
+                    strStatus = "Dis-charging";
+                } else if (status == BatteryManager.BATTERY_STATUS_NOT_CHARGING){
+                    strStatus = "Not charging";
+                } else if (status == BatteryManager.BATTERY_STATUS_FULL){
+                    strStatus = "Full";
+                } else {
+                    strStatus = "Unknown";
+                }
+                batteryStatus.setText("Status: " + strStatus);
+
+                int health = arg1.getIntExtra("health", BatteryManager.BATTERY_HEALTH_UNKNOWN);
+                String strHealth;
+                if (health == BatteryManager.BATTERY_HEALTH_GOOD){
+                    strHealth = "Good";
+                } else if (health == BatteryManager.BATTERY_HEALTH_OVERHEAT){
+                    strHealth = "Over Heat";
+                } else if (health == BatteryManager.BATTERY_HEALTH_DEAD){
+                    strHealth = "Dead";
+                } else if (health == BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE){
+                    strHealth = "Over Voltage";
+                } else if (health == BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE){
+                    strHealth = "Unspecified Failure";
+                } else{
+                    strHealth = "Unknown";
+                }
+                batteryHealth.setText("Health: " + strHealth);
+
+            }
+        }
+
+    };
+
+
 
   private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -1295,32 +1355,6 @@ public class MainActivity extends AppCompatActivity {
         mConnectedThread.start();
     }
 
-
-    public class ThreadBluetooth implements Runnable{
-
-        public ThreadBluetooth(){
-
-            Log.d(TAG,"Hilo Thread Bluetooth Creado");
-        }
-
-        @Override
-        public void run() {
-
-                       runOnUiThread(new Runnable() {
-                           @Override
-                           public void run() {
-
-                               Log.d(TAG, "conectarBluetooth");
-
-                               conectarBluetooth();
-
-                           }
-                       });
-
-
-
-        }
-    }
 
     public class ThreadBlue extends Thread{
 
