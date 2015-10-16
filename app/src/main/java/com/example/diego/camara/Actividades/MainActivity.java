@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     public static Boolean MUTEALARM = false;
     public static Boolean  BOOLFILM=true;
 
-
+    static String ALARMA_ALMACENADA="";
     public static final String ALARMA_INTRUSION="2";
     public static final String ALARMA_APERTURA="3";
     public static final String ALARMA_EN_BATERIAS="4";
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     public static String Alarmabluetooth = "0";
 
     static boolean CONEXIONBLUE=false;
-    ConexionIP ClienteTCP;
+    static ConexionIP ClienteTCP;
     ServicioGPS servicio;
     // sms
     EnviarSMS sms;
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
     public static int IdRadiobase = 0;
     Intent intentKeepAlive;
     public ConnectUploadAsync cliente;
-    String IpPublica;
+    static String IpPublica;
     //CheckAlarmas alarmas;
     Thread alarmas;
 
@@ -207,33 +207,25 @@ public class MainActivity extends AppCompatActivity {
 
                                 case "A":
                                     if (!MUTEALARM) {
-                                        alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_INTRUSION, IpPublica, 9001, getApplicationContext(), audioBool));
-                                        alarmas.start();
-                                        //mCamera.takePicture(null, null, mPicture);
+                                        ALARMA_ALMACENADA=ALARMA_INTRUSION;
                                         Filmacion();
                                     }
                                  break;
                                 case "B":
                                     if (!MUTEALARM) {
-
-                                        alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_INTRUSION, IpPublica, 9001, getApplicationContext(), audioBool));
-                                        alarmas.start();
+                                        ALARMA_ALMACENADA=ALARMA_INTRUSION;
                                         Filmacion();
                                     }
                                     break;
                                 case "C":
                                     if (!MUTEALARM) {
-                                        alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_INTRUSION, IpPublica, 9001, getApplicationContext(), audioBool));
-                                        alarmas.start();
-
+                                        ALARMA_ALMACENADA=ALARMA_INTRUSION;
                                         Filmacion();
                                     }
                                     break;
                                 case "D":
                                     if (!MUTEALARM) {
-                                        alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_APERTURA, IpPublica, 9001, getApplicationContext(), audioBool));
-                                        alarmas.start();
-                                      //  mCamera.takePicture(null, null, mPicture);
+                                        ALARMA_ALMACENADA=ALARMA_APERTURA;
                                         Filmacion();
                                     }
                                     break;
@@ -839,14 +831,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStampFechaFolder = new SimpleDateFormat("yyyy_MM_dd").format(new Date());
+        String timeStampFecha = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        String timeStampHora = new SimpleDateFormat("HHmmss").format(new Date());
         File mediaFile;
         if (type == MEDIA_TYPE_IMAGE){
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "Radiobase_"+edit_IdRadio.getText().toString()+"_IMG_"+ timeStamp + ".jpg");
+                    "Radiobase_"+edit_IdRadio.getText().toString()+"_IMG_"+ timeStampFecha + "_"+timeStampHora+".jpg");
         } else if(type == MEDIA_TYPE_VIDEO) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "Radiobase_"+edit_IdRadio.getText().toString()+"_VID_"+ timeStamp + ".mp4");
+                    "Radiobase_"+edit_IdRadio.getText().toString()+"_VID_"+ timeStampFecha +"_"+timeStampHora+".mp4");
+            String link= "videos/Radiobase_ID_"+IdRadiobase+"/"+timeStampFechaFolder+"/"+
+            "Radiobase_"+edit_IdRadio.getText().toString()+"_VID_"+ timeStampFecha +"_"+timeStampHora+".mp4";
+                    ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+ALARMA_ALMACENADA+" "+link );
+           ClienteTCP.start();
         } else {
             return null;
         }
@@ -880,6 +878,9 @@ public class MainActivity extends AppCompatActivity {
    }
 
     public void Filmacion(){
+
+        alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_ALMACENADA, IpPublica, 9001, getApplicationContext(), audioBool));
+        alarmas.start();
 
         MUTEALARM=true;
 
@@ -920,7 +921,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
         MUTEALARM=false;
-            EnviarFTP();
+
+        EnviarFTP();
 
     }
 
@@ -988,7 +990,7 @@ public class MainActivity extends AppCompatActivity {
             if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
 
                 Log.d(TAG, " BluetoothDesconectado!! ");
-                   ConexionIP ClienteTCP=new ConexionIP(IpPublica, 9001," "+IdRadiobase+" "+BLUETOOTH_OFF);
+                ConexionIP ClienteTCP=new ConexionIP(IpPublica, 9001," "+IdRadiobase+" "+BLUETOOTH_OFF);
                 ClienteTCP.start();
                 sms=new EnviarSMS(context,Diego,"Bluetooth Desconectado");
                 sms.sendSMS();

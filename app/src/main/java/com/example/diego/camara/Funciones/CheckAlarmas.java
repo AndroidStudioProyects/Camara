@@ -34,17 +34,17 @@ public class CheckAlarmas implements Runnable {
 
                Audio =new Multimedia(contex,2);
                if(audioBool){Audio.AudioPlay();}
-               msg=Mensaje(IdRadiobase,2);
-               ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
-               ClienteTCP.start();
+              // msg=Mensaje(IdRadiobase,2);
+              // ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
+              // ClienteTCP.start();
                Log.d(TAG, "Audio alarma Intrusion");
                break;
            case "3":
                Audio =new Multimedia(contex,3);
                if(audioBool){Audio.AudioPlay();}
-               msg=Mensaje(IdRadiobase,3);
-               ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
-               ClienteTCP.start();
+             //  msg=Mensaje(IdRadiobase,3);
+              // ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
+               // ClienteTCP.start();
                Log.d(TAG, "Audio alarma ");
                break;
            case "4":
