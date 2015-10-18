@@ -297,7 +297,8 @@ public class MainActivity extends AppCompatActivity {
         this.registerReceiver(this.myBatteryReceiver,
                 new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 
-
+  //      ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+INCIA_APLICACION);
+  //      ClienteTCP.start();
 
     }
 
@@ -838,12 +839,18 @@ public class MainActivity extends AppCompatActivity {
         if (type == MEDIA_TYPE_IMAGE){
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "Radiobase_"+edit_IdRadio.getText().toString()+"_IMG_"+ timeStampFecha + "_"+timeStampHora+".jpg");
+            String link= "videos/Radiobase_ID_"+IdRadiobase+"/"+timeStampFechaFolder+"/"+
+                    "Radiobase_"+edit_IdRadio.getText().toString()+"_IMG_"+ timeStampFecha +"_"+timeStampHora+".jpg";
+            ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+ALARMA_ALMACENADA+" "+link );
+            ClienteTCP.start();
+
+
         } else if(type == MEDIA_TYPE_VIDEO) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "Radiobase_"+edit_IdRadio.getText().toString()+"_VID_"+ timeStampFecha +"_"+timeStampHora+".mp4");
             String link= "videos/Radiobase_ID_"+IdRadiobase+"/"+timeStampFechaFolder+"/"+
             "Radiobase_"+edit_IdRadio.getText().toString()+"_VID_"+ timeStampFecha +"_"+timeStampHora+".mp4";
-                    ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+ALARMA_ALMACENADA+" "+link );
+          ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+ALARMA_ALMACENADA+" "+link );
            ClienteTCP.start();
         } else {
             return null;
@@ -1053,8 +1060,9 @@ public class MainActivity extends AppCompatActivity {
                                 case "V":
                                     sms=new EnviarSMS(getApplicationContext(),senderNum,"Solicitud de Video:ok");
                                     sms.sendSMS();
-                                    ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+SMS_SOLICITUD_VIDEO);
-                                    ClienteTCP.start();
+                               //     ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+SMS_SOLICITUD_VIDEO);
+                               // ClienteTCP.start();
+                                    ALARMA_ALMACENADA=SMS_SOLICITUD_VIDEO;
                                     Filmacion();
                                     Log.d(TAG, " VIDEO SMS");
                                     break;
@@ -1063,6 +1071,7 @@ public class MainActivity extends AppCompatActivity {
                                     sms.sendSMS();
                                     ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+SMS_FOTO);
                                     ClienteTCP.start();
+                                    ALARMA_ALMACENADA=SMS_FOTO;
                                     // MUTEALARM=true;
                                     mCamera.takePicture(null, null, mPicture);
                                     // MUTEALARM=false;
@@ -1147,8 +1156,8 @@ public class MainActivity extends AppCompatActivity {
                                 case "On":
                                     Log.d(TAG, " SENSORES ACTIVADOS SMS");
 
-                                    alarmas=new Thread(new CheckAlarmas(IdRadiobase,SENSORES_ACTIVADOS ,IpPublica, 9001, getApplicationContext(),audioBool));
-                                    alarmas.start();
+                                  //  alarmas=new Thread(new CheckAlarmas(IdRadiobase,SENSORES_ACTIVADOS ,IpPublica, 9001, getApplicationContext(),audioBool));
+                                  //  alarmas.start();
                                     switch_muteAlarm.setChecked(false);
                                     sms=new EnviarSMS(getApplicationContext(),senderNum,"Sensores Activados");
                                     sms.sendSMS();
@@ -1157,8 +1166,8 @@ public class MainActivity extends AppCompatActivity {
                                 case "Off":
                                     Log.d(TAG, " SENSORES DESACTIVADOS SMS");
 
-                                    alarmas=new Thread(new CheckAlarmas(IdRadiobase, SENSORES_DESACTIVADOS,IpPublica, 9001, getApplicationContext(),audioBool));
-                                    alarmas.start();
+                                  //  alarmas=new Thread(new CheckAlarmas(IdRadiobase, SENSORES_DESACTIVADOS,IpPublica, 9001, getApplicationContext(),audioBool));
+                                  //  alarmas.start();
                                      switch_muteAlarm.setChecked(true);
                                     sms=new EnviarSMS(getApplicationContext(),senderNum,"Sensores Desactivados");
                                     sms.sendSMS();
@@ -1180,8 +1189,8 @@ public class MainActivity extends AppCompatActivity {
 
                                    sms=new EnviarSMS(getApplicationContext(),senderNum,"http://maps.google.com/maps?z=15&q="+servicio.LatyLong());
                                     sms.sendSMS();
-                                   ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+GPS+" http://maps.google.com/maps?z=15&q="+servicio.LatyLong());
-                                   ClienteTCP.start();
+                                //   ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+GPS);
+                                //   ClienteTCP.start();
                                     break;
 
                                 default:
