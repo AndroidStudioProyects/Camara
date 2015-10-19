@@ -934,14 +934,19 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context arg0, Intent arg1) {
             // TODO Auto-generated method stub
+            String Level,Voltage,Temperature,Status,Health;
+
 
             if (arg1.getAction().equals(Intent.ACTION_BATTERY_CHANGED)){
                 batteryLevel.setText("Level: "
                         + String.valueOf(arg1.getIntExtra("level", 0)) + "%");
+                Level= String.valueOf(arg1.getIntExtra("level", 0)) + "%";
                 batteryVoltage.setText("Voltage: "
                         + String.valueOf((float)arg1.getIntExtra("voltage", 0)/1000) + "V");
+                Voltage=String.valueOf((float)arg1.getIntExtra("voltage", 0)/1000) + "V";
                 batteryTemperature.setText("Temperature: "
                         + String.valueOf((float)arg1.getIntExtra("temperature", 0)/10) + "c");
+                Temperature= String.valueOf((float)arg1.getIntExtra("temperature", 0)/10) + "c";
                 batteryTechnology.setText("Technology: " + arg1.getStringExtra("technology"));
 
                 int status = arg1.getIntExtra("status", BatteryManager.BATTERY_STATUS_UNKNOWN);
@@ -958,7 +963,7 @@ public class MainActivity extends AppCompatActivity {
                     strStatus = "Unknown";
                 }
                 batteryStatus.setText("Status: " + strStatus);
-
+                Status=strStatus;
                 int health = arg1.getIntExtra("health", BatteryManager.BATTERY_HEALTH_UNKNOWN);
                 String strHealth;
                 if (health == BatteryManager.BATTERY_HEALTH_GOOD){
@@ -975,6 +980,11 @@ public class MainActivity extends AppCompatActivity {
                     strHealth = "Unknown";
                 }
                 batteryHealth.setText("Health: " + strHealth);
+                Health=strHealth;
+                ClienteTCP=new ConexionIP(IpPublica,9002," "+IdRadiobase+" 1 "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+servicio.LatyLong());
+                 ClienteTCP.start();
+
+
 
             }
 

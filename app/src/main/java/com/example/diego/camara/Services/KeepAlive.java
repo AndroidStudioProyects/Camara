@@ -10,7 +10,7 @@ import android.os.BatteryManager;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
-
+import com.example.diego.camara.Services.ServicioGPS;
 import com.example.diego.camara.Funciones.ConexionIP;
 
 
@@ -28,7 +28,7 @@ public class KeepAlive  extends Service {
     static ServicioGPS geoloc;
     static String geo;
     static String Level,Voltage,Temperature,Status,Health;
-
+   //static ServicioGPS servicio;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         SharedPreferences mispreferencias=getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
@@ -44,8 +44,8 @@ public class KeepAlive  extends Service {
        Toast.makeText(getApplicationContext(), "Servicio Keep Alive iniciado: ", Toast.LENGTH_SHORT).show();
        // Log.d(TAG, "OnStart Keep Alive Bool: "+Bool);
 
-        this.registerReceiver(this.myBatteryReceiver,
-                new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+      //  this.registerReceiver(this.myBatteryReceiver,
+       //         new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 
       return START_STICKY;
     }
@@ -75,8 +75,12 @@ public class KeepAlive  extends Service {
 
             try {
                 Thread.sleep(TiempoSeg * 1000);
-                ClienteTCP=new ConexionIP(IpPublica,PuertoKA," "+IdRadiobase+" 1 "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+"-37.8669982,-58.0802339");
+                //ClienteTCP=new ConexionIP(IpPublica,PuertoKA," "+IdRadiobase+" 1 "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+"-37.8669982,-58.0802339");
+               // Log.d(TAG, "\nKeep Alive !! IpServer: " + IpPublica + " Puerto: " + PuertoKA + " TiempoSeg: " + TiempoSeg+" IdRadiobase: " + IdRadiobase);
+                ClienteTCP=new ConexionIP(IpPublica,PuertoKA," "+IdRadiobase+" 1 - - - - - -");
                 Log.d(TAG, "\nKeep Alive !! IpServer: " + IpPublica + " Puerto: " + PuertoKA + " TiempoSeg: " + TiempoSeg+" IdRadiobase: " + IdRadiobase);
+
+
                 ClienteTCP.start();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -86,7 +90,7 @@ public class KeepAlive  extends Service {
     }
 
 
-
+/*
     private BroadcastReceiver myBatteryReceiver = new BroadcastReceiver(){
 
         @Override
@@ -134,7 +138,7 @@ public class KeepAlive  extends Service {
             }
         }
 
-    };
+    };*/
 
 
 
