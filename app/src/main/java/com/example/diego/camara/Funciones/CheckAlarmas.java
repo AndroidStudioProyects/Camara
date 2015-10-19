@@ -3,6 +3,8 @@ package com.example.diego.camara.Funciones;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.diego.camara.Actividades.MainActivity;
+
 /**
  * Created by Diego on 09/05/2015.
  */
@@ -34,18 +36,12 @@ public class CheckAlarmas implements Runnable {
 
                Audio =new Multimedia(contex,2);
                if(audioBool){Audio.AudioPlay();}
-              // msg=Mensaje(IdRadiobase,2);
-              // ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
-              // ClienteTCP.start();
-               Log.d(TAG, "Audio alarma Intrusion");
+               Log.d(TAG, "Audio alarma Intrusion: ");
                break;
            case "3":
                Audio =new Multimedia(contex,3);
                if(audioBool){Audio.AudioPlay();}
-             //  msg=Mensaje(IdRadiobase,3);
-              // ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
-               // ClienteTCP.start();
-               Log.d(TAG, "Audio alarma ");
+               Log.d(TAG, "Audio alarma de apertura: ");
                break;
            case "4":
                Audio =new Multimedia(contex,4);
@@ -53,12 +49,12 @@ public class CheckAlarmas implements Runnable {
                msg=Mensaje(IdRadiobase,4);
                ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
                ClienteTCP.start();
-               Log.d(TAG, "Audio alarma 4");
+               Log.d(TAG, "Audio alarma en baterias:");
                break;
            case "6":
                Audio =new Multimedia(contex,6);
                if(audioBool){Audio.AudioPlay();}
-               msg=Mensaje(IdRadiobase,6);
+               msg=Mensaje(IdRadiobase,5);
                ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
                ClienteTCP.start();
                Log.d(TAG, "Audio Sistema Energizado");
@@ -70,7 +66,7 @@ public class CheckAlarmas implements Runnable {
                msg=Mensaje(IdRadiobase,14);
                ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
                ClienteTCP.start();
-            //   Log.d(TAG, "Audio Sistema Energizado");
+             Log.d(TAG, "Audio Sensores Activados");
                break;
            case "15":
                Audio =new Multimedia(contex,8);
@@ -78,22 +74,9 @@ public class CheckAlarmas implements Runnable {
                msg=Mensaje(IdRadiobase,15);
                ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
                ClienteTCP.start();
-               Log.d(TAG, "Audio Sistema Energizado");
+               Log.d(TAG, "Audio Sensores Desactivados");
                break;
-           case "12":
 
-               msg=Mensaje(IdRadiobase,12);
-               ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
-               ClienteTCP.start();
-               Log.d(TAG, "Audio Sistema Energizado");
-               break;
-           case "17":
-
-               msg=Mensaje(IdRadiobase,17);
-               ClienteTCP=new ConexionIP(IpPublica,Puerto,msg);
-               ClienteTCP.start();
-               Log.d(TAG, "Aplicacion Cerrada");
-               break;
            case "25":
                Audio =new Multimedia(contex,9);
                if(audioBool){Audio.AudioPlay();}

@@ -61,14 +61,14 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-
-    public static String Diego = "02235776581";
+    public static String MASTER_PHONE = "";
     public static String LatyLong;
     public static String BLUE_PRUEBA_STATIC;
     public static Boolean MUTEALARM = false;
     public static Boolean  BOOLFILM=true;
 
     static String ALARMA_ALMACENADA="";
+    public static final String OK="1";
     public static final String ALARMA_INTRUSION="2";
     public static final String ALARMA_APERTURA="3";
     public static final String ALARMA_EN_BATERIAS="4";
@@ -93,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
     public static final String RESET_BLUETOOTH="23";
     public static final String CONEXION_BLUETOOTH_EXITOSA="24";
     public static final String PERSONAL_NO_AUTORIZADO="25";
+
+
+    public static String STATUS_BATTERY="";
 
     ///////////////////////////////
 
@@ -168,16 +171,18 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate inicio");
 
         setContentView(R.layout.activity_main);
+
         LevantarXML();
         Botones();
 
+      //  CargarPreferencias();
 
         IdRadiobase = Integer.parseInt(edit_IdRadio.getText().toString());
         IpPublica = edit_IP.getText().toString();
-        Diego=edit_Telefono.getText().toString();
-        Toast.makeText(this, Diego, Toast.LENGTH_SHORT).show();
-        //      BotonesEnabled(false);
+        MASTER_PHONE=edit_Telefono.getText().toString();
+
         CAMARA_ON();
+
         ////defino bluetooth adapter
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         checkBTState();//Checkeo el estado
@@ -188,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 switch (msg.what) {
+
                     case RECIEVE_MESSAGE:
                                            // if receive massage
                         byte[] readBuf = (byte[]) msg.obj;
@@ -196,74 +202,77 @@ public class MainActivity extends AppCompatActivity {
                         int endOfLineIndex = sb.indexOf("\r\n");                            // determine the end-of-line
                         if (endOfLineIndex > 0) {                                            // if end-of-line,
 
-                            String sbprint = sb.substring(0, endOfLineIndex);               // extract string
-                            Alarmabluetooth = sbprint;
-                            sb.delete(0, sb.length());                                      // and clear
-                            Log.d(TAG, "Mensaje del Arduino: " + Alarmabluetooth);
+                        String sbprint = sb.substring(0, endOfLineIndex);               // extract string
+                        Alarmabluetooth = sbprint;
+                        sb.delete(0, sb.length());                                      // and clear
+                        Log.d(TAG, "Mensaje del Arduino: " + Alarmabluetooth);
 
 
-                            switch (Alarmabluetooth){
+                        switch (Alarmabluetooth){
 
 
-                                case "A":
-                                    if (!MUTEALARM) {
-                                        ALARMA_ALMACENADA=ALARMA_INTRUSION;
-                                        Filmacion();
-                                    }
-                                 break;
-                                case "B":
-                                    if (!MUTEALARM) {
-                                        ALARMA_ALMACENADA=ALARMA_INTRUSION;
-                                        Filmacion();
-                                    }
-                                    break;
-                                case "C":
-                                    if (!MUTEALARM) {
-                                        ALARMA_ALMACENADA=ALARMA_INTRUSION;
-                                        Filmacion();
-                                    }
-                                    break;
-                                case "D":
-                                    if (!MUTEALARM) {
-                                        ALARMA_ALMACENADA=ALARMA_APERTURA;
-                                        Filmacion();
-                                    }
-                                    break;
-                                case "f":
+                            case "A":
+                                if (!MUTEALARM) {
+                                    Toast.makeText(getApplicationContext(),"entro",Toast.LENGTH_SHORT).show();
+                                    ALARMA_ALMACENADA=ALARMA_INTRUSION;
+                                   Filmacion();
+                                }
+                                break;
+                            case "B":
+                                if (!MUTEALARM) {
+                                    ALARMA_ALMACENADA=ALARMA_INTRUSION;
+                                   Filmacion();
+                                }
+                                break;
+                            case "C":
+                                if (!MUTEALARM) {
+                                    ALARMA_ALMACENADA=ALARMA_INTRUSION;
+                                    Filmacion();
+                                }
+                                break;
+                            case "D":
+                                if (!MUTEALARM) {
+                                    ALARMA_ALMACENADA=ALARMA_APERTURA;
+                                    Filmacion();
+                                }
+                                break;
+                            case "f":
                                 if (!MUTEALARM) {
                                     ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+SMS_ALARMA_SIMULADA);
                                     ClienteTCP.start();
-                                  // alarma simulada por sms
+                                    // alarma simulada por sms
                                 }
                                 break;
-                                case "o" :
-                                    sms=new EnviarSMS(getApplicationContext(),Diego,"Open Door ok");
-                                    sms.sendSMS();
-                                    ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+OPEN_DOOR);
-                                    ClienteTCP.start();
-                                    break;
-                                case "l":
-                                    sms=new EnviarSMS(getApplicationContext(),Diego,"Loop OK");
-                                    sms.sendSMS();
-                                    ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+LOOP_EXITOSO);
-                                    ClienteTCP.start();
-                                    break;
-                                case "e":
+                            case "o" :
+                                sms=new EnviarSMS(getApplicationContext(),MASTER_PHONE,"Open Door ok");
+                                sms.sendSMS();
+                                ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+OPEN_DOOR);
+                                ClienteTCP.start();
+                                break;
+                            case "l":
+                                sms=new EnviarSMS(getApplicationContext(),MASTER_PHONE,"Loop OK");
+                                sms.sendSMS();
+                                ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+LOOP_EXITOSO);
+                                ClienteTCP.start();
+                                break;
+                            case "e":
 
-                                    break;
+                                break;
 
-                                case "b" :
-                                    sms=new EnviarSMS(getApplicationContext(),Diego,"Hard reset Bluetooth ok");
-                                    sms.sendSMS();
-                                    ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+"+ "+HARD_RESET_BLUETOOTH);
-                                    ClienteTCP.start();
-                                    break;
-                                default:break;
+                            case "b" :
+                                sms=new EnviarSMS(getApplicationContext(),MASTER_PHONE,"Hard reset Bluetooth ok");
+                                sms.sendSMS();
+                                ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+"+ "+HARD_RESET_BLUETOOTH);
+                                ClienteTCP.start();
+                                break;
+                            default:break;
 
-
-                            }
 
                         }
+
+                    }
+
+
                         break;
 
                 }
@@ -272,14 +281,9 @@ public class MainActivity extends AppCompatActivity {
         };
 
         Log.d(TAG,"ConectarBluetooth Oncreate");
-        // ****************************
-     //   conectarBluetooth();/// NO TOCAR!!! SE CONECTA CO ESTO AL REINICIAR
-     //   blueLocal =new Thread(new ThreadBluetooth());
-     //   blueLocal.start();
-     //   blue=new ThreadBlue();
-      //7  blue.start();
+
         new ThreadBlue().run();
-        //********************************
+
         Log.d(TAG, "ConectarBluetooth Oncreate");
 
         servicio=new ServicioGPS(getApplicationContext());
@@ -297,27 +301,18 @@ public class MainActivity extends AppCompatActivity {
         this.registerReceiver(this.myBatteryReceiver,
                 new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 
-  //      ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+INCIA_APLICACION);
-  //      ClienteTCP.start();
-
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-
-     //  conectarBluetooth();
         Log.d(TAG, "OnResume ");
         CargarPreferencias();
         mCamera.startPreview();
-
-     //   blue=new ThreadBlue();
-      //    blue.start();
-        //new ThreadBlue().run();
         ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+INCIA_APLICACION);
         ClienteTCP.start();
-        //Toast.makeText(getApplicationContext(), (CharSequence) parameters.getPictureSize(),Toast.LENGTH_LONG).show();
+
     }
 
     @Override
@@ -326,15 +321,15 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "OnStop");
         GuardarPreferencias();
 
-       // blueLocal = null;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+      //  ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+APLICACION_CERRADA);
+
         unregisterReceiver(SmsRecibido);
-        ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+APLICACION_CERRADA);
-        ClienteTCP.start();
+
         BLUE_PRUEBA_STATIC="B\n";
         mConnectedThread.write(BLUE_PRUEBA_STATIC);
         Log.d(TAG, "OnDestroy");
@@ -453,8 +448,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                             Log.d(TAG, "Boton de Foto");
             mCamera.takePicture(null, null, mPicture);
-                ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+SMS_FOTO);
-                ClienteTCP.start();
+
             }
 
 
@@ -464,8 +458,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                Filmacion();
-                ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+SMS_SOLICITUD_VIDEO);
-                ClienteTCP.start();
+
                 Log.d(TAG, "Boton de Video");
             }
         });
@@ -555,7 +548,7 @@ public class MainActivity extends AppCompatActivity {
                     GuardarPreferencias();
                     IdRadiobase = Integer.parseInt(edit_IdRadio.getText().toString());
                     IpPublica = edit_IP.getText().toString();
-                    Diego=edit_Telefono.getText().toString();
+                    MASTER_PHONE=edit_Telefono.getText().toString();
                     intentKeepAlive = new Intent(getApplicationContext(), KeepAlive.class);
                     intentKeepAlive.putExtra("bool", true);
                     startService(intentKeepAlive);
@@ -836,26 +829,28 @@ public class MainActivity extends AppCompatActivity {
         String timeStampFecha = new SimpleDateFormat("yyyyMMdd").format(new Date());
         String timeStampHora = new SimpleDateFormat("HHmmss").format(new Date());
         File mediaFile;
+        String link;
         if (type == MEDIA_TYPE_IMAGE){
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "Radiobase_"+edit_IdRadio.getText().toString()+"_IMG_"+ timeStampFecha + "_"+timeStampHora+".jpg");
-            String link= "videos/Radiobase_ID_"+IdRadiobase+"/"+timeStampFechaFolder+"/"+
-                    "Radiobase_"+edit_IdRadio.getText().toString()+"_IMG_"+ timeStampFecha +"_"+timeStampHora+".jpg";
-            ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+ALARMA_ALMACENADA+" "+link );
-            ClienteTCP.start();
+          link= "videos/Radiobase_ID_"+IdRadiobase+"/"+timeStampFechaFolder+"/"+
+                  "Radiobase_"+edit_IdRadio.getText().toString()+"_IMG_"+ timeStampFecha +"_"+timeStampHora+".jpg";
 
 
         } else if(type == MEDIA_TYPE_VIDEO) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "Radiobase_"+edit_IdRadio.getText().toString()+"_VID_"+ timeStampFecha +"_"+timeStampHora+".mp4");
-            String link= "videos/Radiobase_ID_"+IdRadiobase+"/"+timeStampFechaFolder+"/"+
+            link= "videos/Radiobase_ID_"+IdRadiobase+"/"+timeStampFechaFolder+"/"+
             "Radiobase_"+edit_IdRadio.getText().toString()+"_VID_"+ timeStampFecha +"_"+timeStampHora+".mp4";
-          ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+ALARMA_ALMACENADA+" "+link );
-           ClienteTCP.start();
+
         } else {
+
+
             return null;
         }
 
+        ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+ALARMA_ALMACENADA+" "+link );
+        ClienteTCP.start();
         return mediaFile;
     }
 
@@ -872,7 +867,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     private void EnviarFTP(){
 
 
@@ -886,10 +880,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void Filmacion(){
 
+        MUTEALARM=true;
         alarmas = new Thread(new CheckAlarmas(IdRadiobase, ALARMA_ALMACENADA, IpPublica, 9001, getApplicationContext(), audioBool));
         alarmas.start();
-
-        MUTEALARM=true;
 
             if (prepareVideoRecorder()) {
                    mMediaRecorder.start();
@@ -984,6 +977,9 @@ public class MainActivity extends AppCompatActivity {
                 batteryHealth.setText("Health: " + strHealth);
 
             }
+
+
+
         }
 
     };
@@ -999,16 +995,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, " BluetoothDesconectado!! ");
                 ConexionIP ClienteTCP=new ConexionIP(IpPublica, 9001," "+IdRadiobase+" "+BLUETOOTH_OFF);
                 ClienteTCP.start();
-                sms=new EnviarSMS(context,Diego,"Bluetooth Desconectado");
-                sms.sendSMS();
-
                 txtConexionBluetooth.setText("ConexionBluetooth: DESCONECTADO");
 
-           //     conectarBluetooth();
-            //   blueLocal =new Thread(new ThreadBluetooth());
-            //    blueLocal.start();
                 new ThreadBlue().run();
-
 
             }
 
@@ -1018,8 +1007,8 @@ public class MainActivity extends AppCompatActivity {
               //     Toast.makeText(getApplicationContext(),"Device is now connected",Toast.LENGTH_SHORT).show();
               ConexionIP ClienteTCP=new ConexionIP(IpPublica, 9001," "+IdRadiobase+" "+BLUETOOTH_ON);
               ClienteTCP.start();
-              sms=new EnviarSMS(context,Diego,"Bluetooth Conectado");
-              sms.sendSMS();
+          //    sms=new EnviarSMS(context,MASTER_PHONE,"Bluetooth Conectado");
+          //    sms.sendSMS();
 
           }
 
@@ -1029,11 +1018,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void BroadcastSMS() {
 
-
-
         SmsRecibido=new BroadcastReceiver() {
-
-
 
             ConexionIP ClienteTCP;
 
@@ -1053,7 +1038,7 @@ public class MainActivity extends AppCompatActivity {
                             String senderNum = phoneNumber;
                             String message = currentMessage.getDisplayMessageBody();
                        //   Toast.makeText(getApplicationContext(),senderNum,Toast.LENGTH_SHORT).show();
-                            if(phoneNumber.toString().equals(Diego)){
+                            if(phoneNumber.toString().equals(MASTER_PHONE)){
 
                             switch (message){
 
@@ -1069,8 +1054,8 @@ public class MainActivity extends AppCompatActivity {
                                 case "F":
                                     sms=new EnviarSMS(getApplicationContext(),senderNum,"Solicitud de Foto:ok");
                                     sms.sendSMS();
-                                    ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+SMS_FOTO);
-                                    ClienteTCP.start();
+                                //    ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+SMS_FOTO);
+                                //    ClienteTCP.start();
                                     ALARMA_ALMACENADA=SMS_FOTO;
                                     // MUTEALARM=true;
                                     mCamera.takePicture(null, null, mPicture);
@@ -1099,7 +1084,6 @@ public class MainActivity extends AppCompatActivity {
 
                                 case "Conf":
                                     SharedPreferences mispreferencias=getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
-                                    String fono=mispreferencias.getString("Telefono", "02235776581");
                                     String id =mispreferencias.getString("IdRadio", "1");
                                     String server=mispreferencias.getString("edit_IP", "idirect.dlinkddns.com");
                                     String portserver=mispreferencias.getString("edit_Port", "9001");
@@ -1123,11 +1107,9 @@ public class MainActivity extends AppCompatActivity {
 
                                 case "K":
                                     Log.d(TAG, " KILL APP SMS");
-
-                                    sms=new EnviarSMS(getApplicationContext(),senderNum,"Kill Aplication:ok");
-                                    sms.sendSMS();
                                     ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+APLICACION_CERRADA);
                                     ClienteTCP.start();
+                                    Thread.sleep(3000);
                                     finish();
                                     System.exit(0);
                                     break;
@@ -1216,8 +1198,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
          ////////////////////////fUNCIONES Bluettoh
-
-
 
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
         if(Build.VERSION.SDK_INT >= 10){
@@ -1396,7 +1376,7 @@ public class MainActivity extends AppCompatActivity {
     public void CargarPreferencias(){
 
         SharedPreferences mispreferencias=getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
-        edit_Telefono.setText(mispreferencias.getString("Telefono", "02235776581"));
+        edit_Telefono.setText(mispreferencias.getString("Telefono", "00000000000"));
         edit_IdRadio.setText(mispreferencias.getString("IdRadio", "1"));
         edit_IP.setText(mispreferencias.getString("edit_IP", "idirect.dlinkddns.com"));
         edit_Port.setText(mispreferencias.getString("edit_Port", "9001"));

@@ -13,12 +13,13 @@ import com.example.diego.camara.Funciones.EnviarSMS;
  * Created by Diego on 30/04/2015.
  */
 public class Booteo extends BroadcastReceiver {
-EnviarSMS sms;
+
+  //  EnviarSMS sms;
+  //  String MASTER_PHONE=MainActivity.MASTER_PHONE;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        sms=new EnviarSMS(context,"2235776581","SmartPhone Reiniciado");
-        sms.sendSMS();
+
         try {
             Thread.sleep(30000);
         } catch (InterruptedException e) {
@@ -39,8 +40,6 @@ EnviarSMS sms;
 
         ConexionIP ClienteTCP=new ConexionIP(IP,Puerto," "+Id+" 13");
         ClienteTCP.start();
-        sms=new EnviarSMS(context,"02235776581","Reseteo completado");
-        sms.sendSMS();
 
     }
 }
