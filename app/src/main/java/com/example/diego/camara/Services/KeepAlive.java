@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.location.LocationListener;
 import android.os.BatteryManager;
 import android.os.IBinder;
 import android.util.Log;
@@ -17,7 +18,7 @@ import com.example.diego.camara.Funciones.ConexionIP;
 /**
  * Created by Diego on 09/05/2015.
  */
-public class KeepAlive  extends Service {
+public class KeepAlive  extends Service{
     static ConexionIP ClienteTCP;
     static int IdRadiobase, TiempoSeg,PuertoKA;
     static String IpPublica;
@@ -90,55 +91,6 @@ public class KeepAlive  extends Service {
     }
 
 
-/*
-    private BroadcastReceiver myBatteryReceiver = new BroadcastReceiver(){
-
-        @Override
-        public void onReceive(Context arg0, Intent arg1) {
-            // TODO Auto-generated method stub
-
-            if (arg1.getAction().equals(Intent.ACTION_BATTERY_CHANGED)){
-                Level=String.valueOf(arg1.getIntExtra("level", 0)) + "%";
-                Voltage=String.valueOf((float)arg1.getIntExtra("voltage", 0)/1000) + "V";
-                Temperature=String.valueOf((float)arg1.getIntExtra("temperature", 0)/10) + "c";
-
-
-                int status = arg1.getIntExtra("status", BatteryManager.BATTERY_STATUS_UNKNOWN);
-                String strStatus;
-                if (status == BatteryManager.BATTERY_STATUS_CHARGING){
-                    strStatus = "Charging";
-                } else if (status == BatteryManager.BATTERY_STATUS_DISCHARGING){
-                    strStatus = "Dis-charging";
-                } else if (status == BatteryManager.BATTERY_STATUS_NOT_CHARGING){
-                    strStatus = "Not charging";
-                } else if (status == BatteryManager.BATTERY_STATUS_FULL){
-                    strStatus = "Full";
-                } else {
-                    strStatus = "Unknown";
-                }
-                Status=strStatus;
-
-                int health = arg1.getIntExtra("health", BatteryManager.BATTERY_HEALTH_UNKNOWN);
-                String strHealth;
-                if (health == BatteryManager.BATTERY_HEALTH_GOOD){
-                    strHealth = "Good";
-                } else if (health == BatteryManager.BATTERY_HEALTH_OVERHEAT){
-                    strHealth = "Over Heat";
-                } else if (health == BatteryManager.BATTERY_HEALTH_DEAD){
-                    strHealth = "Dead";
-                } else if (health == BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE){
-                    strHealth = "Over Voltage";
-                } else if (health == BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE){
-                    strHealth = "Unspecified Failure";
-                } else{
-                    strHealth = "Unknown";
-                }
-                Health=strHealth;
-
-            }
-        }
-
-    };*/
 
 
 
