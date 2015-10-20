@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import com.example.diego.camara.Actividades.MainActivity;
 import com.example.diego.camara.Funciones.CheckAlarmas;
 import com.example.diego.camara.Funciones.ConexionIP;
 
@@ -28,9 +29,7 @@ CheckAlarmas alarmas;
         Boolean audioBool=mispreferencias.getBoolean("audioBool",true);
        // Toast.makeText(contexto, "Sistema Energizado", Toast.LENGTH_SHORT).show();
 
-        ClienteTCP = new ConexionIP(IP, Puerto, " 1 6");
-        ClienteTCP.start();
-        alarmas = new CheckAlarmas(IdRadiobase, "6", IP, Puerto, context,audioBool);
+        alarmas = new CheckAlarmas(IdRadiobase,"6", IP, Puerto, context,audioBool);
         alarmas.run();
     }
 }

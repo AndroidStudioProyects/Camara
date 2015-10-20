@@ -8,45 +8,12 @@
     tools:context=".MainActivity"
     android:weightSum="1">
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Servidor: "
-            android:id="@+id/textView2" />
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/edit_ServerFtp"
-            android:text="192.168.0.102" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="355dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0.09">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New Text"
-            android:id="@+id/textView5" />
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/edit_Puerto"
-            android:layout_weight="1"
-            android:text="21" />
-    </LinearLayout>
+        android:text="Configracion FTP"
+        android:id="@+id/textView"
+        android:layout_weight="0.08" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -57,14 +24,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="User: "
+            android:text="User FTP: "
             android:id="@+id/textView3" />
 
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/edit_User"
-            android:text="idirect" />
+            android:text="anonimo" />
 
     </LinearLayout>
 
@@ -77,7 +44,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pass"
+            android:text="Pass FTP"
             android:id="@+id/textView4" />
 
         <EditText
@@ -86,65 +53,17 @@
             android:inputType="textPassword"
             android:ems="10"
             android:id="@+id/edit_Pass"
-            android:text="IDIRECT" />
+            android:text="anonimo" />
     </LinearLayout>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Conectar"
-        android:id="@+id/btn_Conectar"
-        android:layout_alignTop="@+id/btn_Subir"
-        android:layout_alignRight="@+id/btn_Subir"
-        android:layout_alignEnd="@+id/btn_Subir" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="subir Archivo"
-        android:id="@+id/btn_Subir"
-        />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Path:"
-        android:id="@+id/textView"
-
-        android:layout_below="@+id/btn_Subir"
-        />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/text_Path"
-        />
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Bytes Transferidos: "
-            android:id="@+id/textView6" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="-------------"
-            android:id="@+id/text_Bytes" />
-    </LinearLayout>
-
-    <ProgressBar
-        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="354dp"
         android:layout_height="wrap_content"
-        android:id="@+id/progressBar"
-        android:indeterminate="false"
-        android:max="100" />
+        android:text="Guardar"
+        android:id="@+id/btn_Guardar"
+        android:layout_alignTop="@+id/btn_Subir"
+        android:layout_alignRight="@+id/btn_Subir"
+        android:layout_alignEnd="@+id/btn_Subir"
+        android:layout_weight="0.18" />
 
 </LinearLayout>

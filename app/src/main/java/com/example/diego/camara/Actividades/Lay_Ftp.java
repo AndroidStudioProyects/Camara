@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.diego.camara.Ftp.ConnectUploadAsync;
 import com.example.diego.camara.R;
@@ -26,54 +27,39 @@ public class Lay_Ftp extends Activity {
         // connnectingwithFTP cliente;
         ConnectUploadAsync cliente;
 
-        Button btn_Subir, btn_Conectar;
-        EditText edit_ServerFtp,edit_Puerto,edit_User,edit_Pass;
-        File Archivo;
-        public TextView text_Bytes;
-        String userName,pass,ip;
-
-        public ProgressBar progressbar;
-
-
+        Button btn_Guardar;
+        EditText edit_User,edit_Pass;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.lay_ftp);
-           levantar_xml();
+            levantar_xml();
             Botones();
-            CargarPreferenciasFTP();
 
 
         }
 
-        @Override
-        protected void onPause() {
-            super.onPause();
-            GuardarPreferenciasFTP();
 
-
-        }
 
         @Override
         protected void onResume() {
             super.onResume();
-
             CargarPreferenciasFTP();
+
+
         }
+
+
 
         private void Botones() {
 
-            btn_Conectar.setOnClickListener(new View.OnClickListener() {
+            btn_Guardar.setOnClickListener(new View.OnClickListener() {
 
 
                 @Override
                 public void onClick(View v) {
-
-                    ip=edit_ServerFtp.getText().toString();
-                    userName=edit_User.getText().toString();
-                    pass=edit_Pass.getText().toString();
-
+                    GuardarPreferenciasFTP();
 
                 }
             });
@@ -82,17 +68,12 @@ public class Lay_Ftp extends Activity {
         }
 
         private void levantar_xml() {
-            btn_Conectar= (Button) findViewById(R.id.btn_Conectar);
-            btn_Subir= (Button) findViewById(R.id.btn_Subir);
 
-            text_Bytes=(TextView)findViewById(R.id.text_Bytes);
-
-            edit_ServerFtp=(EditText)findViewById(R.id.edit_ServerFtp);
-            edit_Puerto=(EditText)findViewById(R.id.edit_Puerto);
             edit_User=(EditText)findViewById(R.id.edit_User);
             edit_Pass=(EditText)findViewById(R.id.edit_Pass);
-            progressbar=(ProgressBar)findViewById(R.id.progressBar);
-        }
+
+            btn_Guardar=(Button)findViewById(R.id.btn_Guardar);
+          }
 
 
         @Override
@@ -121,24 +102,22 @@ public class Lay_Ftp extends Activity {
         ///////////////////// PREFERENCIAS DE USUARIO ////////////////
         public void CargarPreferenciasFTP(){
 
-            SharedPreferences mispreferencias=getSharedPreferences("PreferenciasUsuarioFTP", Context.MODE_PRIVATE);
-            edit_ServerFtp.setText(mispreferencias.getString("edit_IP_Ftp", "giovanazzi.dlinkddns.com"));
-            edit_User.setText(mispreferencias.getString("edit_User_Ftp", "idirect"));
-            edit_Pass.setText(mispreferencias.getString("edit_Pass_Ftp", "IDIRECT"));
+            SharedPreferences mispreferencias = getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
+        edit_User.setText(mispreferencias.getString("User_Ftp", "anonimo"));
+            edit_Pass.setText(mispreferencias.getString("Pass_Ftp", "anonimo"));
             Log.d("Android_FTP", "Preferencias Cargadas");
 
 
         }
 
         public void GuardarPreferenciasFTP() {
-            SharedPreferences mispreferencias = getSharedPreferences("PreferenciasUsuarioFTP", Context.MODE_PRIVATE);
+            SharedPreferences mispreferencias = getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = mispreferencias.edit();
-            editor.putString("edit_IP_Ftp", edit_ServerFtp.getText().toString());
-            editor.putString("edit_User_Ftp", edit_User.getText().toString());
-            editor.putString("edit_Pass_Ftp", edit_Pass.getText().toString());
+           editor.putString("User_Ftp", edit_User.getText().toString());
+            editor.putString("Pass_Ftp", edit_Pass.getText().toString());
             editor.commit();
             Log.d("Android_FTP", "Preferencias Almacenadas");
-
+            Toast.makeText(getApplicationContext(),"Preferencias FTP Almacenadas",Toast.LENGTH_SHORT).show();
         }
 // //////////////////////////////////////////////////////////
     }

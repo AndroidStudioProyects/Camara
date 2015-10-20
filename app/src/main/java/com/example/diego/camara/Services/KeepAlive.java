@@ -1,20 +1,24 @@
 package com.example.diego.camara.Services;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.location.LocationListener;
+import android.os.BatteryManager;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
-
+import com.example.diego.camara.Services.ServicioGPS;
 import com.example.diego.camara.Funciones.ConexionIP;
 
 
 /**
  * Created by Diego on 09/05/2015.
  */
-public class KeepAlive  extends Service {
+public class KeepAlive  extends Service{
     static ConexionIP ClienteTCP;
     static int IdRadiobase, TiempoSeg,PuertoKA;
     static String IpPublica;
@@ -22,8 +26,10 @@ public class KeepAlive  extends Service {
     static boolean Bool=true;
     Intent intento;
     Hilo hilito;
-
-
+    static ServicioGPS geoloc;
+    static String geo;
+    static String Level,Voltage,Temperature,Status,Health;
+   //static ServicioGPS servicio;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         SharedPreferences mispreferencias=getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
@@ -35,8 +41,12 @@ public class KeepAlive  extends Service {
         TiempoSeg = Integer.parseInt(mispreferencias.getString("edit_TimerKA", "10"));
         hilito=new Hilo();
         hilito.start();
-        Toast.makeText(getApplicationContext(), "Servicio Keep Alive iniciado", Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "OnStart Keep Alive Bool: "+Bool);
+        //geo=geoloc.LatyLong();
+       Toast.makeText(getApplicationContext(), "Servicio Keep Alive iniciado: ", Toast.LENGTH_SHORT).show();
+       // Log.d(TAG, "OnStart Keep Alive Bool: "+Bool);
+
+      //  this.registerReceiver(this.myBatteryReceiver,
+       //         new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 
       return START_STICKY;
     }
@@ -66,8 +76,12 @@ public class KeepAlive  extends Service {
 
             try {
                 Thread.sleep(TiempoSeg * 1000);
-                ClienteTCP=new ConexionIP(IpPublica,PuertoKA," "+IdRadiobase+" 1");
+                //ClienteTCP=new ConexionIP(IpPublica,PuertoKA," "+IdRadiobase+" 1 "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+"-37.8669982,-58.0802339");
+               // Log.d(TAG, "\nKeep Alive !! IpServer: " + IpPublica + " Puerto: " + PuertoKA + " TiempoSeg: " + TiempoSeg+" IdRadiobase: " + IdRadiobase);
+                ClienteTCP=new ConexionIP(IpPublica,PuertoKA," "+IdRadiobase+" 1 - - - - - -");
                 Log.d(TAG, "\nKeep Alive !! IpServer: " + IpPublica + " Puerto: " + PuertoKA + " TiempoSeg: " + TiempoSeg+" IdRadiobase: " + IdRadiobase);
+
+
                 ClienteTCP.start();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -75,4 +89,9 @@ public class KeepAlive  extends Service {
           //  Log.d(TAG, "KeepAlive run salida bool: "+Bool);
         }
     }
+
+
+
+
+
 }

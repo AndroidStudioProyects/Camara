@@ -29,13 +29,11 @@ public class SmsRecibido extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         SharedPreferences mispreferencias = context.getSharedPreferences("PreferenciasUsuario", Context.MODE_PRIVATE);
-        String IP = mispreferencias.getString("edit_IP", "idirect.dlinkddns.com");
-        String Id=mispreferencias.getString("IdRadio", "1");
-        int Puerto = Integer.parseInt(mispreferencias.getString("edit_Port", "9001"));
+     //   String IP = mispreferencias.getString("edit_IP", "idirect.dlinkddns.com");
+   //     String Id=mispreferencias.getString("IdRadio", "1");
+        String MASTER_PHONE=mispreferencias.getString("Telefono","00000000000");
+//        int Puerto = Integer.parseInt(mispreferencias.getString("edit_Port", "9001"));
 
-        ConexionIP ClienteTCP = new ConexionIP(IP, Puerto, " "+Id+" 9");
-        ClienteTCP.start();
-        servicio=new ServicioGPS(contexto);
 
         final Bundle bundle = intent.getExtras();
 
@@ -49,19 +47,15 @@ public class SmsRecibido extends BroadcastReceiver {
                     String phoneNumber = currentMessage.getDisplayOriginatingAddress();
                     String senderNum = phoneNumber;
                     String message = currentMessage.getDisplayMessageBody();
-                    if(phoneNumber.toString().equals("02235776581")) {
+                    if(phoneNumber.toString().equals(MASTER_PHONE)) {
                         switch (message) {
 
-                             case "Inicio":
+                             case "I":
                                 Intent intento = new Intent(context, MainActivity.class);
                                 intento.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 intento.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                                 context.startActivity(intento);
-                                sms = new EnviarSMS(context, "02235776581", "Solo Inicio de aplicacion");
-                                sms.sendSMS();
 
-                                ClienteTCP = new ConexionIP(IP, Puerto, " " + Id + " 19");
-                                ClienteTCP.start();
                                 break;
 
                             default:
@@ -74,19 +68,6 @@ public class SmsRecibido extends BroadcastReceiver {
             Log.e("SmsReceiver", "Exception smsReceiver" + e);
         }
     }
-
-private static void rebootDevice(){
-    try{
-        Process proceso=Runtime.getRuntime().exec("su");
-        DataOutputStream os =new DataOutputStream(proceso.getOutputStream());
-        os.writeBytes("reboot\n");
-    }catch (Throwable t){
-        t.printStackTrace();
-    }
-
-
-    }
-
 
 
 
