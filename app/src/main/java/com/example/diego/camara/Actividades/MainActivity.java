@@ -61,6 +61,9 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static String USER_FTP = "";
+    public static String PASS_FTP = "";
+
     public static String MASTER_PHONE = "";
     public static String LatyLong;
     public static String BLUE_PRUEBA_STATIC;
@@ -411,13 +414,11 @@ public class MainActivity extends AppCompatActivity {
         btn_Enviar_FTP.setOnClickListener(new OnClickListener() {
 
             String ip = edit_IP.getText().toString();
-            String userName = "idirect";
-            String pass = "IDIRECT";
 
             @Override
             public void onClick(View v) {
 
-                cliente = new ConnectUploadAsync(getApplicationContext(), ip, userName, pass, MainActivity.this);
+                cliente = new ConnectUploadAsync(getApplicationContext(), ip, USER_FTP, PASS_FTP, MainActivity.this);
                 cliente.execute();
 
             }
@@ -871,10 +872,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         String ip=IpPublica;
-        String userName="idirect";
-        String pass="IDIRECT";
 
-        cliente = new ConnectUploadAsync(getApplicationContext(),ip,userName,pass,MainActivity.this);
+        cliente = new ConnectUploadAsync(getApplicationContext(),ip,USER_FTP,PASS_FTP,MainActivity.this);
         cliente.execute();
    }
 
@@ -1115,6 +1114,7 @@ public class MainActivity extends AppCompatActivity {
                                     sms.sendSMS();
                                     break;
 
+                             
                                 case "K":
                                     Log.d(TAG, " KILL APP SMS");
                                     ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+APLICACION_CERRADA);
@@ -1181,8 +1181,7 @@ public class MainActivity extends AppCompatActivity {
 
                                    sms=new EnviarSMS(getApplicationContext(),senderNum,"http://maps.google.com/maps?z=15&q="+servicio.LatyLong());
                                     sms.sendSMS();
-                                //   ConexionIP ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+GPS);
-                                //   ClienteTCP.start();
+
                                     break;
 
                                 default:
@@ -1396,6 +1395,8 @@ public class MainActivity extends AppCompatActivity {
         toggleAudio.setChecked(mispreferencias.getBoolean("audioBool", true));
         toggle_ka.setChecked(mispreferencias.getBoolean("boolKA", true));
         switch_muteAlarm.setChecked(mispreferencias.getBoolean("muteAlarm", false));
+        USER_FTP=mispreferencias.getString("User_Ftp", "anonimo");
+        PASS_FTP=mispreferencias.getString("Pass_Ftp", "anonimo");
         Log.d(TAG, "Preferencias Cargadas , boolKA: " + toggle_ka.isChecked());
 
     }
@@ -1414,6 +1415,8 @@ public class MainActivity extends AppCompatActivity {
         editor.putBoolean("audioBool", toggleAudio.isChecked());
         editor.putBoolean("boolKA", toggle_ka.isChecked());
         editor.putBoolean("muteAlarm", switch_muteAlarm.isChecked());
+        editor.putString("edit_User_Ftp", USER_FTP);
+        editor.putString("edit_Pass_Ftp", PASS_FTP);
         editor.commit();
         Log.d(TAG, "Preferencias Guardadas , boolKA: " + mispreferencias.getBoolean("boolKA", true));
 
