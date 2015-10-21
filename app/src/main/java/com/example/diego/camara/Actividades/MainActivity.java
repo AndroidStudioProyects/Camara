@@ -26,8 +26,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -978,6 +976,8 @@ public class MainActivity extends AppCompatActivity {
                 } else{
                     strHealth = "Unknown";
                 }
+
+                //prueba
                 batteryHealth.setText("Health: " + strHealth);
                 Health=strHealth;
                 ClienteTCP=new ConexionIP(IpPublica,9002," "+IdRadiobase+" 1 "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+servicio.LatyLong());
