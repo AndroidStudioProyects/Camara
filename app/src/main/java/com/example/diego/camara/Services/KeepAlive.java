@@ -1,17 +1,13 @@
 package com.example.diego.camara.Services;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.location.LocationListener;
-import android.os.BatteryManager;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
-import com.example.diego.camara.Services.ServicioGPS;
+
 import com.example.diego.camara.Funciones.ConexionIP;
 
 
@@ -27,7 +23,7 @@ public class KeepAlive  extends Service{
     Intent intento;
     Hilo hilito;
     static ServicioGPS geoloc;
-    static String geo;
+    public static String Lat="-,",Long="-";
     static String Level,Voltage,Temperature,Status,Health;
    //static ServicioGPS servicio;
     @Override
@@ -78,7 +74,7 @@ public class KeepAlive  extends Service{
                 Thread.sleep(TiempoSeg * 1000);
                 //ClienteTCP=new ConexionIP(IpPublica,PuertoKA," "+IdRadiobase+" 1 "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+"-37.8669982,-58.0802339");
                // Log.d(TAG, "\nKeep Alive !! IpServer: " + IpPublica + " Puerto: " + PuertoKA + " TiempoSeg: " + TiempoSeg+" IdRadiobase: " + IdRadiobase);
-                ClienteTCP=new ConexionIP(IpPublica,PuertoKA," "+IdRadiobase+" 1 - - - - - -");
+                ClienteTCP=new ConexionIP(IpPublica,PuertoKA," "+IdRadiobase+" 1 - - - - - "+Lat+Long);
                 Log.d(TAG, "\nKeep Alive !! IpServer: " + IpPublica + " Puerto: " + PuertoKA + " TiempoSeg: " + TiempoSeg+" IdRadiobase: " + IdRadiobase);
 
 

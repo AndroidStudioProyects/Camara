@@ -67,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     public static String BLUE_PRUEBA_STATIC;
     public static Boolean MUTEALARM = false;
     public static Boolean  BOOLFILM=true;
+
+    public static String Latitud="0.0",Longitud="0.0";
 //
     static String ALARMA_ALMACENADA="";
     public static final String OK="1";
@@ -101,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
     ///////////////////////////////
 
-    String Nivel_anterior="0",Nivel_Actual="0";
+    String Nivel_anterior="0",Status_anterior="0";
     int Status_Contador=0;
     //Linvor Bluetooth
     public static String address = "00:12:12:04:41:11";
@@ -282,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        Log.d(TAG,"ConectarBluetooth Oncreate");
+        Log.d(TAG, "ConectarBluetooth Oncreate");
 
         new ThreadBlue().run();
 
@@ -290,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
 
         servicio=new ServicioGPS(getApplicationContext());
         text_GPS.setText(servicio.LatyLong());
-        LatyLong=servicio.LatyLong();
+
 
 /// BroadcastReceiver  Bluettoth
 
@@ -963,6 +965,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 batteryStatus.setText("Status: " + strStatus);
                 Status=strStatus;
+
                 int health = arg1.getIntExtra("health", BatteryManager.BATTERY_HEALTH_UNKNOWN);
                 String strHealth;
                 if (health == BatteryManager.BATTERY_HEALTH_GOOD){
@@ -985,12 +988,13 @@ public class MainActivity extends AppCompatActivity {
 
             //agregado 21-10-2015
 
-            if(!(Nivel_anterior.toString().equals(Level))){
-                Status_Contador=0;
+            if(!(Nivel_anterior.toString().equals(Level) || Status_anterior.toString().equals(Status))){
+
                 Nivel_anterior=Level;
-                ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+STATUS_INFO+" "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+servicio.LatyLong());
+                Status_anterior=Status;
+                ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+STATUS_INFO+" "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+Latitud+","+Longitud);
                 ClienteTCP.start();
-                Log.d(TAG, "Status Info IpServer: " + IpPublica + " Puerto: 9001 "+ IdRadiobase+" "+STATUS_INFO+" "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+servicio.LatyLong());
+                Log.d(TAG, "Status Info IpServer: " + IpPublica + " Puerto: 9001 "+ IdRadiobase+" "+STATUS_INFO+" "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+Latitud+","+Longitud);
 
             }
 

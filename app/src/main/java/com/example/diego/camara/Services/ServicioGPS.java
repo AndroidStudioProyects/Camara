@@ -12,6 +12,8 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.example.diego.camara.Actividades.MainActivity;
+
 /**
  * Created by diego on 15/09/15.
  */
@@ -43,12 +45,18 @@ public class ServicioGPS extends Service implements LocationListener {
             gpsActivo = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         } catch (Exception e) {
         }
-        if (gpsActivo) {
+        if (gpsActivo) {   //LatyLong=servicio.LatyLong();
 
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000 * 60, 10, this);
             location=locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
             latitud=location.getLatitude();
+            KeepAlive.Lat=String.valueOf(latitud);
+            MainActivity.Latitud=String.valueOf(latitud);
+
             longitud=location.getLongitude();
+            KeepAlive.Long=String.valueOf(longitud);
+            MainActivity.Longitud=String.valueOf(longitud);
+
             Log.d("GPS","Esta activo");
         }else{
 
@@ -79,6 +87,9 @@ public class ServicioGPS extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
+
+
+        getLocation();
 
     }
 
