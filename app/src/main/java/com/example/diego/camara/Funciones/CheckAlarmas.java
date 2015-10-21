@@ -3,8 +3,6 @@ package com.example.diego.camara.Funciones;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.diego.camara.Actividades.MainActivity;
-
 /**
  * Created by Diego on 09/05/2015.
  */

@@ -4,17 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.*;
+import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
 import com.example.diego.camara.Actividades.MainActivity;
-import com.example.diego.camara.Funciones.ConexionIP;
 import com.example.diego.camara.Funciones.EnviarSMS;
 import com.example.diego.camara.Services.ServicioGPS;
-
-import java.io.DataOutputStream;
-import java.lang.Process;
 
 
 /**

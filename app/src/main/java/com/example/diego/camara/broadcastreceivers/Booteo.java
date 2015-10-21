@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 
 import com.example.diego.camara.Actividades.MainActivity;
 import com.example.diego.camara.Funciones.ConexionIP;
-import com.example.diego.camara.Funciones.EnviarSMS;
 
 /**
  * Created by Diego on 30/04/2015.

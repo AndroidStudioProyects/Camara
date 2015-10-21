@@ -58,7 +58,7 @@ import java.util.UUID;
 
 
 public class MainActivity extends AppCompatActivity {
-
+// prueba commit
     public static String USER_FTP = "";
     public static String PASS_FTP = "";
 
@@ -67,13 +67,13 @@ public class MainActivity extends AppCompatActivity {
     public static String BLUE_PRUEBA_STATIC;
     public static Boolean MUTEALARM = false;
     public static Boolean  BOOLFILM=true;
-
+//
     static String ALARMA_ALMACENADA="";
     public static final String OK="1";
     public static final String ALARMA_INTRUSION="2";
     public static final String ALARMA_APERTURA="3";
     public static final String ALARMA_EN_BATERIAS="4";
-    public static final String ALARMA_RED_ELECTRICA="5";
+    public static final String C0NECTADO_RED_ELECTRICA="5";
     public static final String BLUETOOTH_OFF="6";
     public static final String BLUETOOTH_ON="7";
     public static final String HARD_RESET_BLUETOOTH="8";
@@ -94,14 +94,15 @@ public class MainActivity extends AppCompatActivity {
     public static final String RESET_BLUETOOTH="23";
     public static final String CONEXION_BLUETOOTH_EXITOSA="24";
     public static final String PERSONAL_NO_AUTORIZADO="25";
+    public static final String STATUS_INFO="26";
 
 
     public static String STATUS_BATTERY="";
 
     ///////////////////////////////
 
-
-
+    String Nivel_anterior="0",Nivel_Actual="0";
+    int Status_Contador=0;
     //Linvor Bluetooth
     public static String address = "00:12:12:04:41:11";
     public static String Alarmabluetooth = "0";
@@ -301,7 +302,8 @@ public class MainActivity extends AppCompatActivity {
 
         this.registerReceiver(this.myBatteryReceiver,
                 new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-
+        ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+INCIA_APLICACION);
+        ClienteTCP.start();
     }
 
 
@@ -311,8 +313,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "OnResume ");
         CargarPreferencias();
         mCamera.startPreview();
-        ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+INCIA_APLICACION);
-        ClienteTCP.start();
+
 
     }
 
@@ -931,10 +932,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context arg0, Intent arg1) {
             // TODO Auto-generated method stub
-            String Level,Voltage,Temperature,Status,Health;
+            String Level = "0%",Voltage = "0v",Temperature = "0c",Status = "Unknown",Health = "Unknown";
 
 
             if (arg1.getAction().equals(Intent.ACTION_BATTERY_CHANGED)){
+                Status_Contador++;
                 batteryLevel.setText("Level: "
                         + String.valueOf(arg1.getIntExtra("level", 0)) + "%");
                 Level= String.valueOf(arg1.getIntExtra("level", 0)) + "%";
@@ -976,17 +978,21 @@ public class MainActivity extends AppCompatActivity {
                 } else{
                     strHealth = "Unknown";
                 }
-
-                //prueba
                 batteryHealth.setText("Health: " + strHealth);
                 Health=strHealth;
-                ClienteTCP=new ConexionIP(IpPublica,9002," "+IdRadiobase+" 1 "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+servicio.LatyLong());
-                 ClienteTCP.start();
-
-
 
             }
 
+            //agregado 21-10-2015
+
+            if(!(Nivel_anterior.toString().equals(Level))){
+                Status_Contador=0;
+                Nivel_anterior=Level;
+                ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+STATUS_INFO+" "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+servicio.LatyLong());
+                ClienteTCP.start();
+                Log.d(TAG, "Status Info IpServer: " + IpPublica + " Puerto: 9001 "+ IdRadiobase+" "+STATUS_INFO+" "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+servicio.LatyLong());
+
+            }
 
 
         }

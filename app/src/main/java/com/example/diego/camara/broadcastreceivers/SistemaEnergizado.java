@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import com.example.diego.camara.Actividades.MainActivity;
 import com.example.diego.camara.Funciones.CheckAlarmas;
 import com.example.diego.camara.Funciones.ConexionIP;
 

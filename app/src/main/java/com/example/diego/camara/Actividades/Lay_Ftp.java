@@ -10,14 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.diego.camara.Ftp.ConnectUploadAsync;
 import com.example.diego.camara.R;
-
-import java.io.File;
 
 /**
  * Created by Diego on 30/05/2015.
@@ -60,7 +56,7 @@ public class Lay_Ftp extends Activity {
                 @Override
                 public void onClick(View v) {
                     GuardarPreferenciasFTP();
-
+                    finish();
                 }
             });
 
