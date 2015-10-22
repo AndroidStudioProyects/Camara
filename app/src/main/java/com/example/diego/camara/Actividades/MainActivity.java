@@ -1135,7 +1135,23 @@ public class MainActivity extends AppCompatActivity {
                                     sms=new EnviarSMS(getApplicationContext(),senderNum,Info);
                                     sms.sendSMS();
                                     break;
+                                case "#Conf":
+                                    String vt="10" ,ip="idirect.dlinkddns.com",pe="9001",pk="9002";
+                                    id="1";
 
+                                    edit_Telefono.setText(phoneNumber);
+                                    edit_IdRadio.setText(id);
+                                    edit_IP.setText(ip);
+                                    edit_Port.setText(pe);
+                                    edit_PortKA.setText(pk);
+                                    edit_DuracionVideo.setText(vt);
+
+                                    GuardarPreferencias();
+
+                                    sms=new EnviarSMS(context,senderNum,"Preferencias Almacenadas");
+                                    sms.sendSMS();
+
+                                    break;
                              
                                 case "K":
                                     Log.d(TAG, " KILL APP SMS");
