@@ -988,7 +988,7 @@ public class MainActivity extends AppCompatActivity {
 
             //agregado 21-10-2015
 
-            if(!(Nivel_anterior.toString().equals(Level) || Status_anterior.toString().equals(Status))){
+            if(!(Nivel_anterior.toString().equals(Level))){
 
                 Nivel_anterior=Level;
                 Status_anterior=Status;
@@ -997,6 +997,18 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "Status Info IpServer: " + IpPublica + " Puerto: 9001 "+ IdRadiobase+" "+STATUS_INFO+" "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+Latitud+","+Longitud);
 
             }
+            if(!(Status_anterior.toString().equals(Status))){
+
+
+                Nivel_anterior=Level;
+                Status_anterior=Status;
+                ClienteTCP=new ConexionIP(IpPublica,9001," "+IdRadiobase+" "+STATUS_INFO+" "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+Latitud+","+Longitud);
+                ClienteTCP.start();
+                Log.d(TAG, "Status Info IpServer: " + IpPublica + " Puerto: 9001 "+ IdRadiobase+" "+STATUS_INFO+" "+Level+" "+Voltage+" "+Temperature+" "+Status+" "+Health+" "+Latitud+","+Longitud);
+
+
+            }
+
 
 
         }
@@ -1134,9 +1146,11 @@ public class MainActivity extends AppCompatActivity {
                                     System.exit(0);
                                     break;
                                 case "Open":
+                                    sms=new EnviarSMS(context,senderNum,"Solicitud de Apertura");
+                                    sms.sendSMS();
                                     BLUE_PRUEBA_STATIC="O\n";
                                     mConnectedThread.write(BLUE_PRUEBA_STATIC);
-
+                                    break;
                                 case "Loop":
                                     Log.d(TAG, " LOOP POR SMS");
                                     sms=new EnviarSMS(context,senderNum,"Solicitud de Loop Recibida");
